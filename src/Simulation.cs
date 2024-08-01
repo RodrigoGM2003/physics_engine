@@ -10,8 +10,8 @@ namespace PhysicsEngine
     class Simulation
     {
         // private static readonly float AspectRatio = 16.0f / 9.0f;  // Desired aspect ratio (e.g., 4:3)
-        private static float AspectRatio = 1.0f / 1.0f;  // Desired aspect ratio (e.g., 4:3)
-        private static readonly float FrameTime = 1.0f / 144.0f;   // Frame time for 60 FPS
+        private static float AspectRatio = ComputingConstants.AspectRatio;  // Desired aspect ratio (e.g., 4:3)
+        private static readonly float FrameTime = 1.0f / ComputingConstants.FrameRate;   // Frame time for 60 FPS
         private static RenderWindow window = null!; // The window to draw to
         private static Clock clock = null!; // The clock to keep track of time
         private static float accumulatedTime = 0.0f; // The time that has accumulated since the last frame
@@ -33,16 +33,20 @@ namespace PhysicsEngine
             // Create the bodies
             Body[] Bodies = new Body[5];
             
-            Bodies[0] = new RigidBody(collider: new CircleCollider(new Vector2f(100, 100), 10), 
-                                      drawer: drawer, velocity: new Vector2f(1, -10));
-            Bodies[1] = new RigidBody(collider: new CircleCollider(new Vector2f(100, 100), 10),
-                                      drawer: drawer, velocity: new Vector2f(2, -10));
-            Bodies[2] = new RigidBody(collider: new CircleCollider(new Vector2f(100, 100), 10), 
-                                      drawer: drawer, velocity: new Vector2f(3, -10));
-            Bodies[3] = new RigidBody(collider: new CircleCollider(new Vector2f(100, 100), 10), 
-                                      drawer: drawer, velocity: new Vector2f(4, -10)); 
-            Bodies[4] = new RigidBody(collider: new CircleCollider(new Vector2f(100, 100), 10),
-                                      drawer: drawer, velocity: new Vector2f(5, -10));
+            Bodies[0] = new CircleRigidBody(radius: 10, window: window, color: Color.White, 
+                                            mass: 1, velocity: new Vector2f(1, -10));
+
+            Bodies[1] = new RectangleRigidBody(size: new Vector2f(20, 20), window: window, color: Color.Red, 
+                                            mass: 1, velocity: new Vector2f(2, -10));
+
+            Bodies[2] = new PolygonRigidBody(vertices: new Vector2f[] { new Vector2f(0, 0), new Vector2f(20, 0), new Vector2f(10, 20) }, 
+                                            window: window, color: Color.Yellow, mass: 1, velocity: new Vector2f(3, -10));
+
+            Bodies[3] = new CircleRigidBody(radius: 30, window: window, color: Color.Blue, 
+                                            mass: 10, velocity: new Vector2f(4, -10));
+
+            Bodies[4] = new RectangleRigidBody(size: new Vector2f(80, 20), window: window, color: Color.Green, 
+                                            mass: 1000, velocity: new Vector2f(5, -10));
 
 
             // Start the bodies
