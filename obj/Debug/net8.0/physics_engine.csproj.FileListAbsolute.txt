@@ -196,3 +196,4 @@ C:\Users\xxdri\Desktop\Universidad\Proyectos personales\physics\physics_engine\o
 C:\Users\xxdri\Desktop\Universidad\Proyectos personales\physics\physics_engine\obj\Debug\net8.0\physics_engine.pdb
 C:\Users\xxdri\Desktop\Universidad\Proyectos personales\physics\physics_engine\obj\Debug\net8.0\physics_engine.genruntimeconfig.cache
 C:\Users\xxdri\Desktop\Universidad\Proyectos personales\physics\physics_engine\obj\Debug\net8.0\ref\physics_engine.dll
+C:\Users\xxdri\Desktop\Universidad\Proyectos personales\physics\physics_engine\obj\Debug\net8.0\physics_engine.sourcelink.json
