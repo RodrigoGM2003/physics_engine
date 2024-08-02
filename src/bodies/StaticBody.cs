@@ -21,7 +21,7 @@ namespace PhysicsEngine
         * @param collider The collider for the body
         * @param drawer The drawer for the body
         */
-        public StaticBody(Collider collider, Drawer? drawer = null, Vector2f? velocity = null, Vector2f? acceleration = null)
+        public StaticBody(in Collider collider, in Drawer? drawer = null, Vector2f? velocity = null, Vector2f? acceleration = null)
         {
             Position = new Vector2f(0, 0);
             SBCollider = collider;
@@ -44,7 +44,7 @@ namespace PhysicsEngine
         * Update the state of the StaticBody
         * @param dt The change in time since the last frame
         */
-        public override void Update(float deltaTime)
+        public override void Update(in float deltaTime)
         {
             Velocity += Acceleration * deltaTime;
             Position += Velocity * deltaTime;

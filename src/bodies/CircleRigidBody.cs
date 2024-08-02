@@ -19,7 +19,7 @@ namespace PhysicsEngine
         * @param collider The collider for the object
         * @param drawer The drawer for the object
         */
-        public CircleRigidBody(float radius, RenderWindow window, Color? color = null, float? elasticity = null, float? friction = null,
+        public CircleRigidBody(float radius, in RenderWindow window, Color? color = null, float? elasticity = null, float? friction = null,
                                 float? mass = null, Vector2f? velocity = null, Vector2f? acceleration = null)
         : base(new CircleCollider(new Vector2f(0, 0), radius, elasticity, friction), new CircleDrawer(window, radius, color), 
            mass: mass, velocity: velocity, acceleration: acceleration)

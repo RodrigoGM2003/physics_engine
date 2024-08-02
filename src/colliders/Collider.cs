@@ -3,6 +3,7 @@ using SFML.Graphics;
 using SFML.Window;
 using SFML.System;
 using System.Data;
+using System.Numerics;
 
 
 namespace PhysicsEngine
@@ -13,10 +14,11 @@ namespace PhysicsEngine
     public abstract class Collider
     {
         public Vector2f Position { get; protected set; } // Position in m
+        public Vector2f LastPosition { get; protected set; } // Last position in m (used to calculate swept AABB)
         public float Elasticity { get; protected set; } // The elasticity of the object
         public float Friction { get; protected set; } // The friction of the object
         public FloatRect BoundingBox { get; protected set; } // The bounding box of the object (used to increase performance in collision detection)
-
+        public FloatRect SweptAABB { get; protected set; } // The swept AABB of the object (used to calculate collision response)
 
         /**
          * Base constructor for the Collider class
@@ -27,16 +29,10 @@ namespace PhysicsEngine
         protected Collider(Vector2f position, float? elasticity = null, float? friction = null)
         {
             Position = position;
+            LastPosition = position;
 
-            if (elasticity.HasValue)
-                Elasticity = elasticity.Value;
-            else
-                Elasticity = PhysicsConstants.DefaultElasticity;
-
-            if (friction.HasValue)
-                Friction = friction.Value;
-            else
-                Friction = PhysicsConstants.DefaultFriction;
+            Elasticity = elasticity ?? PhysicsConstants.DefaultElasticity;
+            Friction = friction ?? PhysicsConstants.DefaultFriction;
         }
 
         /**
@@ -44,27 +40,27 @@ namespace PhysicsEngine
          * @param position The new position of the object
          */
         public abstract void UpdatePosition(Vector2f position);
+        
 
         /**
-         * Check if the object intersects with another object
-         * @param other The collider to check for intersection
+         * Update the swept AABB of the object
          */
-        public abstract bool Intersects(Collider other);
+        public void UpdateSweptAABB(){
+            float minX = Math.Min(Position.X - BoundingBox.Width / 2, LastPosition.X - BoundingBox.Width / 2);
+            float minY = Math.Min(Position.Y - BoundingBox.Height / 2, LastPosition.Y - BoundingBox.Height / 2);
+            float maxX = Math.Max(Position.X + BoundingBox.Width / 2, LastPosition.X + BoundingBox.Width / 2);
+            float maxY = Math.Max(Position.Y + BoundingBox.Height / 2, LastPosition.Y + BoundingBox.Height / 2);
+
+            SweptAABB = new FloatRect(minX, minY, maxX - minX, maxY - minY);
+        }
+
         /**
-         * Check if the object intersects with a CircleCollider
-         * @param other The collider to check for intersection
+         * Resolve the collision between the object and another object
+         * @param other The collider to resolve the collision with
          */
-        public abstract bool Intersects(CircleCollider other);
-        /**
-         * Check if the object intersects with a RectangleCollider
-         * @param other The collider to check for intersection
-         */
-        public abstract bool Intersects(RectangleCollider other);
-                /**
-         * Check if the object intersects with a PolygonCollider
-         * @param other The collider to check for intersection
-         */
-        public abstract bool Intersects(PolygonCollider other);
+        public abstract void ResolveCollision(in CircleCollider other);
+        public abstract void ResolveCollision(in RectangleCollider other);
+        public abstract void ResolveCollision(in PolygonCollider other);
 
     }
 }

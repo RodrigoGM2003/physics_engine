@@ -19,7 +19,7 @@ namespace PhysicsEngine
         * @param collider The collider for the object
         * @param drawer The drawer for the object
         */
-        public RectangleRigidBody(Vector2f size, RenderWindow window, Color? color = null, float? elasticity = null, float? friction = null,
+        public RectangleRigidBody(Vector2f size, in RenderWindow window, Color? color = null, float? elasticity = null, float? friction = null,
                                 float? mass = null, Vector2f? velocity = null, Vector2f? acceleration = null)
         : base(new RectangleCollider(new Vector2f(0, 0), size, elasticity, friction), new RectangleDrawer(window, size, color), 
            mass: mass, velocity: velocity, acceleration: acceleration)

@@ -16,7 +16,7 @@ namespace PhysicsEngine
          * @param radius The radius of the circle
          * @param color The color of the shape
          */
-        public RectangleDrawer(RenderWindow _window,  Vector2f size, Color? color = null)
+        public RectangleDrawer(in RenderWindow _window,  Vector2f size, Color? color = null)
         : base(_window)
         {
             Size = size;

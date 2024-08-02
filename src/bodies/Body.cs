@@ -23,7 +23,7 @@ namespace PhysicsEngine
          * Update the state of the object
          * @param dt The change in time since the last frame
          */
-        public abstract void Update(float deltaTime);
+        public abstract void Update(in float deltaTime);
 
         /**
          * Draw the object to the screen

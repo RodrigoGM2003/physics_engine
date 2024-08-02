@@ -15,7 +15,7 @@ namespace PhysicsEngine
          * Constructor for the Drawer class
          * @param window The window to draw to
          */
-        public Drawer(RenderWindow _window)
+        public Drawer(in RenderWindow _window)
         {
             window = _window;
         }

@@ -15,7 +15,7 @@ namespace PhysicsEngine
          * @param radius The radius of the circle
          * @param color The color of the shape
          */
-        public PolygonDrawer(RenderWindow _window,  Vector2f[] vertices, Color? color = null)
+        public PolygonDrawer(in RenderWindow _window,  in Vector2f[] vertices, Color? color = null)
         : base(_window)
         {
             Vertices = vertices;
@@ -38,7 +38,7 @@ namespace PhysicsEngine
          * @param vertices The vertices of the polygon
          * @return The centroid of the polygon
          */
-        private Vector2f CalculateCentroid(Vector2f[] vertices)
+        private Vector2f CalculateCentroid(in Vector2f[] vertices)
         {
             float centroidX = 0, centroidY = 0;
             float signedArea = 0;

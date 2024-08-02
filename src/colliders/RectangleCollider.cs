@@ -35,40 +35,25 @@ namespace PhysicsEngine
          * @param position The new position of the object
          */
         public override void UpdatePosition(Vector2f position){
+            LastPosition = Position;
             Position = position;
-            float expandedWidth = Size.X * ComputingConstants.ColliderExpansion;
-            float expandedHeight = Size.Y * ComputingConstants.ColliderExpansion;
-            BoundingBox = new FloatRect(Position.X - expandedWidth / 2, Position.Y - expandedHeight / 2, expandedWidth, expandedHeight);
+
+            BoundingBox = new FloatRect(Position.X - Size.X / 2, Position.Y - Size.Y / 2, Size.X, Size.Y);
         }
 
 
         /**
-         * Check if the object intersects with another object
-         * @param other The collider to check for intersection
+         * Resolve the collision between the object and another object
+         * @param other The collider to resolve the collision with
          */
-        public override bool Intersects(Collider other){
-            return false;
+        public override void ResolveCollision(in CircleCollider other){
+
         }
-        /**
-         * Check if the object intersects with a RectangleCollider
-         * @param other The collider to check for intersection
-         */
-        public override bool Intersects(CircleCollider other){
-            return false;
+        public override void ResolveCollision(in RectangleCollider other){
+
         }
-        /**
-         * Check if the object intersects with a RectangleCollider
-         * @param other The collider to check for intersection
-         */
-        public override bool Intersects(RectangleCollider other){
-            return false;
-        }
-                /**
-         * Check if the object intersects with a PolygonCollider
-         * @param other The collider to check for intersection
-         */
-        public override bool Intersects(PolygonCollider other){
-            return false;
+        public override void ResolveCollision(in PolygonCollider other){
+
         }
 
     }

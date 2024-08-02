@@ -24,7 +24,7 @@ namespace PhysicsEngine
         * @param collider The collider for the object
         * @param drawer The drawer for the object
         */
-        public RigidBody(Collider collider, Drawer drawer, Vector2f? velocity = null, 
+        public RigidBody(in Collider collider, in Drawer drawer, Vector2f? velocity = null, 
                         Vector2f? acceleration = null, float? mass = null)
         {
             Position = new Vector2f(0, 0);
@@ -49,7 +49,7 @@ namespace PhysicsEngine
         * Update the state of the RigidBody
         * @param dt The change in time since the last frame
         */
-        public override void Update(float deltaTime)
+        public override void Update(in float deltaTime)
         {
             Velocity += Acceleration * deltaTime;
             // Velocity *= (1 - LinearDamping * deltaTime);
@@ -63,6 +63,7 @@ namespace PhysicsEngine
             
             //Update the colliders position
             RBCollider.UpdatePosition(Position);
+            RBCollider.UpdateSweptAABB();
         }
 
         /**

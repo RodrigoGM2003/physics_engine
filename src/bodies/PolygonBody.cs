@@ -19,7 +19,7 @@ namespace PhysicsEngine
         * @param collider The collider for the object
         * @param drawer The drawer for the object
         */
-        public PolygonRigidBody(Vector2f[] vertices, RenderWindow window, Color? color = null, float? elasticity = null, float? friction = null,
+        public PolygonRigidBody(in Vector2f[] vertices, in RenderWindow window, Color? color = null, float? elasticity = null, float? friction = null,
                                 float? mass = null, Vector2f? velocity = null, Vector2f? acceleration = null)
         : base(new PolygonCollider(new Vector2f(0, 0), vertices, elasticity, friction), new PolygonDrawer(window, vertices, color), 
            mass: mass, velocity: velocity, acceleration: acceleration)

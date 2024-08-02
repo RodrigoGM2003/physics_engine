@@ -26,8 +26,7 @@ namespace PhysicsEngine
         {
             Radius = radius;
 
-            float expandedRadius = Radius * ComputingConstants.ColliderExpansion;
-            BoundingBox = new FloatRect(Position.X - expandedRadius, Position.Y - expandedRadius, 2 * expandedRadius, 2 * expandedRadius);
+            BoundingBox = new FloatRect(Position.X - Radius, Position.Y - Radius, 2 * Radius, 2 * Radius);        
         }
 
         /**
@@ -35,40 +34,25 @@ namespace PhysicsEngine
          * @param position The new position of the object
          */
         public override void UpdatePosition(Vector2f position){
+            LastPosition = Position;
             Position = position;
 
-            float expandedRadius = Radius * ComputingConstants.ColliderExpansion;
-            BoundingBox = new FloatRect(Position.X - expandedRadius, Position.Y - expandedRadius, 2 * expandedRadius, 2 * expandedRadius);
+            BoundingBox = new FloatRect(Position.X - Radius, Position.Y - Radius, 2 * Radius, 2 * Radius);        
         }
 
 
         /**
-         * Check if the object intersects with another object
-         * @param other The collider to check for intersection
+         * Resolve the collision between the object and another object
+         * @param other The collider to resolve the collision with
          */
-        public override bool Intersects(Collider other){
-            return false;
+        public override void ResolveCollision(in CircleCollider other){
+
         }
-        /**
-         * Check if the object intersects with a CircleCollider
-         * @param other The collider to check for intersection
-         */
-        public override bool Intersects(CircleCollider other){
-            return false;
+        public override void ResolveCollision(in RectangleCollider other){
+
         }
-        /**
-         * Check if the object intersects with a RectangleCollider
-         * @param other The collider to check for intersection
-         */
-        public override bool Intersects(RectangleCollider other){
-            return false;
-        }
-                /**
-         * Check if the object intersects with a PolygonCollider
-         * @param other The collider to check for intersection
-         */
-        public override bool Intersects(PolygonCollider other){
-            return false;
+        public override void ResolveCollision(in PolygonCollider other){
+
         }
 
     }

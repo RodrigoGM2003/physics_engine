@@ -16,7 +16,7 @@ namespace PhysicsEngine
          * @param radius The radius of the circle
          * @param color The color of the shape
          */
-        public CircleDrawer(RenderWindow _window,  float radius, Color? color = null)
+        public CircleDrawer(in RenderWindow _window,  float radius, Color? color = null)
         : base(_window)
         {
             Radius = radius;
