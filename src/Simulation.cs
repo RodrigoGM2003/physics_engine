@@ -19,6 +19,8 @@ namespace PhysicsEngine
         private static RenderWindow window = null!; // The window to draw to
         private static Clock clock = null!; // The clock to keep track of time
         private static float accumulatedTime = 0.0f; // The time that has accumulated since the last frame
+        private static CollisionManager collisionManager;
+
 
         /**
          * Main method for the simulation
@@ -34,16 +36,19 @@ namespace PhysicsEngine
 
 
             // Create the bodies
-            Body[] Bodies = new Body[3];
+            Body[] Bodies = new Body[2];
             
             Bodies[0] = new CircleRigidBody(radius: 1f, window: window, color: Color.White, 
                                             mass: 1, velocity: new Vector2f(10, -20));
 
-            Bodies[1] = new RectangleRigidBody(size: new Vector2f(4, 2), window: window, color: Color.Red, 
-                                            mass: 1, velocity: new Vector2f(20, -20));
+            Bodies[1] = new CircleRigidBody(radius: 1f, window: window, color: Color.White, 
+                                mass: 1, velocity: new Vector2f(-10, -20));
 
-            Bodies[2] = new PolygonRigidBody(vertices: new Vector2f[] { new Vector2f(0, 0), new Vector2f(2, 0), new Vector2f(1, 2) }, 
-                                            window: window, color: Color.Yellow, mass: 1, velocity: new Vector2f(30, -20));
+            // Bodies[1] = new RectangleRigidBody(size: new Vector2f(4, 2), window: window, color: Color.Red, 
+            //                                 mass: 1, velocity: new Vector2f(20, -20));
+
+            // Bodies[2] = new PolygonRigidBody(vertices: new Vector2f[] { new Vector2f(0, 0), new Vector2f(2, 0), new Vector2f(1, 2) }, 
+            //                                 window: window, color: Color.Yellow, mass: 1, velocity: new Vector2f(30, -20));
 
             // Bodies[3] = new CircleRigidBody(radius: 30, window: window, color: Color.Blue, 
             //                                 mass: 10, velocity: new Vector2f(4, -10));
@@ -52,6 +57,7 @@ namespace PhysicsEngine
             //                                 mass: 1000, velocity: new Vector2f(5, -10));
 
 
+            collisionManager = new CollisionManager(Bodies.Cast<RigidBody>().ToArray());
             // Start the bodies
             Start(ref Bodies);
 
@@ -133,8 +139,10 @@ namespace PhysicsEngine
          */
         private static void Start(ref Body[] Bodies)
         {
-            foreach (Body b in Bodies)
-                b.Start(new Vector2f(0, 60f));
+            Bodies[0].Start(new Vector2f(0, 60f));
+            Bodies[1].Start(new Vector2f(60f, 60f));
+            // foreach (Body b in Bodies)
+            //     b.Start(new Vector2f(0, 60f));
         }
 
         /**
@@ -145,6 +153,17 @@ namespace PhysicsEngine
         {
             foreach (Body b in Bodies)
                 b.Update(deltaTime);
+
+            collisionManager.UpdateBVH(Bodies.Cast<RigidBody>().ToArray());
+
+            var potentialCollisions = collisionManager.GetPotentialCollisions();
+
+            if (potentialCollisions.Count > 0)
+                Console.WriteLine("Collision count: " + potentialCollisions.Count);
+
+            if (potentialCollisions.Count == 0)
+                Console.WriteLine("No");
+            
         }
 
         /**
