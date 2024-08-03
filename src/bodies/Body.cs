@@ -7,11 +7,12 @@ using System.Data;
 namespace PhysicsEngine
 {
     /**
-     * Abstract class for all bodies in the simulation
+     * Abstract class for all collisionable objects in the simulation
      */
     public abstract class Body
     {
         public Vector2f Position { get; protected set; } // Position in m
+
 
         /**
          * Start method for the object

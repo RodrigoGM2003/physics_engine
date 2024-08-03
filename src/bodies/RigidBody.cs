@@ -43,6 +43,7 @@ namespace PhysicsEngine
         {
             Position = position;
             RBCollider.UpdatePosition(Position);
+            RBCollider.UpdateSweptAABB();
         }
 
         /**
@@ -58,7 +59,6 @@ namespace PhysicsEngine
 
             // Apply gravity if the object has mass
             if (Mass > 0)
-
                 ApplyAcceleration(PhysicsConstants.GravityVector);
             
             //Update the colliders position
@@ -73,8 +73,34 @@ namespace PhysicsEngine
         * Note: The position of the object is in meters, so we need to convert it to pixels
         */
         public override void Draw()
-        {
+        {   
             RBDrawer.Draw(Position);
+
+            // RectangleShape shape = new RectangleShape(new Vector2f(maxX - minX, maxY - minY));
+            RectangleShape shape = new RectangleShape(RBCollider.SweptAABB.Size * PhysicsConstants.PixelsPerMeter);
+            shape.Position = new Vector2f(RBCollider.SweptAABB.Left * PhysicsConstants.PixelsPerMeter, RBCollider.SweptAABB.Top * PhysicsConstants.PixelsPerMeter);
+            shape.FillColor = Color.Transparent;
+            shape.OutlineColor = Color.Red;
+            shape.OutlineThickness = 1;
+
+            RenderWindowManager.Window.Draw(shape);
+
+            CircleShape circle = new CircleShape(RBCollider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, 30);
+            circle.Position = new Vector2f(RBCollider.LastPosition.X * PhysicsConstants.PixelsPerMeter, RBCollider.LastPosition.Y * PhysicsConstants.PixelsPerMeter);
+            circle.Origin = new Vector2f(RBCollider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, RBCollider.BoundingBox.Height / 2 * PhysicsConstants.PixelsPerMeter);
+            circle.FillColor = Color.Transparent;
+            circle.OutlineColor = Color.Red;
+            circle.OutlineThickness = 1;
+
+            RenderWindowManager.Window.Draw(circle);
+
+            // circle = new CircleShape(RBCollider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, 30);
+            // circle.Position = new Vector2f(Position.X * PhysicsConstants.PixelsPerMeter, Position.Y * PhysicsConstants.PixelsPerMeter);
+            // circle.Origin = new Vector2f(RBCollider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, RBCollider.BoundingBox.Height / 2 * PhysicsConstants.PixelsPerMeter);
+            // circle.FillColor = Color.Blue;
+            // circle.OutlineColor = Color.Blue;
+            // circle.OutlineThickness = 1;   
+            // RenderWindowManager.Window.Draw(circle);
         }
 
         /**

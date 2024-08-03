@@ -21,8 +21,9 @@ namespace PhysicsEngine
         */
         public RectangleRigidBody(Vector2f size, in RenderWindow window, Color? color = null, float? elasticity = null, float? friction = null,
                                 float? mass = null, Vector2f? velocity = null, Vector2f? acceleration = null)
-        : base(new RectangleCollider(new Vector2f(0, 0), size, elasticity, friction), new RectangleDrawer(window, size, color), 
-           mass: mass, velocity: velocity, acceleration: acceleration)
+        : base(new RectangleCollider(new Vector2f(0, 0), size, elasticity, friction), 
+            new RectangleDrawer(window, size * PhysicsConstants.PixelsPerMeter, color), 
+            mass: mass, velocity: velocity, acceleration: acceleration)
         {
             Size = size;
         }

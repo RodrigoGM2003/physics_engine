@@ -35,7 +35,7 @@ namespace PhysicsEngine
          */
         public override void UpdatePosition(Vector2f position){
             LastPosition = Position;
-            Position = position;
+            Position = position;            
 
             BoundingBox = new FloatRect(Position.X - Radius, Position.Y - Radius, 2 * Radius, 2 * Radius);        
         }

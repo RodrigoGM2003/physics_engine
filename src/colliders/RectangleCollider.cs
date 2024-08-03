@@ -24,10 +24,8 @@ namespace PhysicsEngine
         public RectangleCollider(Vector2f position, Vector2f size, float? elasticity = null, float? friction = null)
         : base(position, elasticity, friction)
         {
-            Size = Size;
-            float expandedWidth = Size.X * ComputingConstants.ColliderExpansion;
-            float expandedHeight = Size.Y * ComputingConstants.ColliderExpansion ;
-            BoundingBox = new FloatRect(Position.X - expandedWidth / 2, Position.Y - expandedHeight / 2, expandedWidth, expandedHeight);
+            Size = size;
+            BoundingBox = new FloatRect(Position.X - Size.X / 2, Position.Y - Size.Y / 2, Size.X, Size.Y);
         }
 
         /**

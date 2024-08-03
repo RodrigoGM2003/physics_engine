@@ -7,6 +7,10 @@ using System.Numerics;
 
 namespace PhysicsEngine
 {
+    public static class RenderWindowManager
+    {
+        public static RenderWindow Window { get; set; } = null!;
+    }
     class Simulation
     {
         // private static readonly float AspectRatio = 16.0f / 9.0f;  // Desired aspect ratio (e.g., 4:3)
@@ -24,29 +28,28 @@ namespace PhysicsEngine
         {
             // Create the window
             window = new RenderWindow(new VideoMode(1000, 750), "SFML.NET Window");
+            RenderWindowManager.Window = window;
             window.Closed += OnWindowClosed;
             window.Resized += OnWindowResized;
 
-            Shape shape = new CircleShape(10);
-            Drawer drawer = new CircleDrawer(window, radius: 10, color: Color.White);
 
             // Create the bodies
-            Body[] Bodies = new Body[5];
+            Body[] Bodies = new Body[3];
             
-            Bodies[0] = new CircleRigidBody(radius: 10, window: window, color: Color.White, 
-                                            mass: 1, velocity: new Vector2f(1, -10));
+            Bodies[0] = new CircleRigidBody(radius: 1f, window: window, color: Color.White, 
+                                            mass: 1, velocity: new Vector2f(10, -20));
 
-            Bodies[1] = new RectangleRigidBody(size: new Vector2f(20, 20), window: window, color: Color.Red, 
-                                            mass: 1, velocity: new Vector2f(2, -10));
+            Bodies[1] = new RectangleRigidBody(size: new Vector2f(4, 2), window: window, color: Color.Red, 
+                                            mass: 1, velocity: new Vector2f(20, -20));
 
-            Bodies[2] = new PolygonRigidBody(vertices: new Vector2f[] { new Vector2f(0, 0), new Vector2f(20, 0), new Vector2f(10, 20) }, 
-                                            window: window, color: Color.Yellow, mass: 1, velocity: new Vector2f(3, -10));
+            Bodies[2] = new PolygonRigidBody(vertices: new Vector2f[] { new Vector2f(0, 0), new Vector2f(2, 0), new Vector2f(1, 2) }, 
+                                            window: window, color: Color.Yellow, mass: 1, velocity: new Vector2f(30, -20));
 
-            Bodies[3] = new CircleRigidBody(radius: 30, window: window, color: Color.Blue, 
-                                            mass: 10, velocity: new Vector2f(4, -10));
+            // Bodies[3] = new CircleRigidBody(radius: 30, window: window, color: Color.Blue, 
+            //                                 mass: 10, velocity: new Vector2f(4, -10));
 
-            Bodies[4] = new RectangleRigidBody(size: new Vector2f(80, 20), window: window, color: Color.Green, 
-                                            mass: 1000, velocity: new Vector2f(5, -10));
+            // Bodies[4] = new RectangleRigidBody(size: new Vector2f(80, 20), window: window, color: Color.Green, 
+            //                                 mass: 1000, velocity: new Vector2f(5, -10));
 
 
             // Start the bodies
@@ -131,7 +134,7 @@ namespace PhysicsEngine
         private static void Start(ref Body[] Bodies)
         {
             foreach (Body b in Bodies)
-                b.Start(new Vector2f(0, 6f));
+                b.Start(new Vector2f(0, 60f));
         }
 
         /**

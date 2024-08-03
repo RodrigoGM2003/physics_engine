@@ -46,6 +46,7 @@ namespace PhysicsEngine
          * Update the swept AABB of the object
          */
         public void UpdateSweptAABB(){
+
             float minX = Math.Min(Position.X - BoundingBox.Width / 2, LastPosition.X - BoundingBox.Width / 2);
             float minY = Math.Min(Position.Y - BoundingBox.Height / 2, LastPosition.Y - BoundingBox.Height / 2);
             float maxX = Math.Max(Position.X + BoundingBox.Width / 2, LastPosition.X + BoundingBox.Width / 2);

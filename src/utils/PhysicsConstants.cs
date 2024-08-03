@@ -9,7 +9,7 @@ namespace PhysicsEngine
 {
     public static class PhysicsConstants
     {
-        public const float PixelsPerMeter = 100.0f;
+        public const float PixelsPerMeter = 10.0f;
         public const float LinearDamping = 0.1f;
 
         public const float Gravity = 9.81f;
