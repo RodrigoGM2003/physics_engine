@@ -36,13 +36,19 @@ namespace PhysicsEngine
 
 
             // Create the bodies
-            Body[] Bodies = new Body[2];
+            Body[] Bodies = new Body[4];
             
             Bodies[0] = new CircleRigidBody(radius: 1f, window: window, color: Color.White, 
                                             mass: 1, velocity: new Vector2f(10, -20));
 
             Bodies[1] = new CircleRigidBody(radius: 1f, window: window, color: Color.White, 
                                 mass: 1, velocity: new Vector2f(-10, -20));
+
+            Bodies[2] = new CircleRigidBody(radius: 2f, window: window, color: Color.White, 
+                                            mass: 1, velocity: new Vector2f(10, -30));
+
+            Bodies[3] = new CircleRigidBody(radius: 3f, window: window, color: Color.White, 
+                                mass: 1, velocity: new Vector2f(0, 0));
 
             // Bodies[1] = new RectangleRigidBody(size: new Vector2f(4, 2), window: window, color: Color.Red, 
             //                                 mass: 1, velocity: new Vector2f(20, -20));
@@ -140,7 +146,9 @@ namespace PhysicsEngine
         private static void Start(ref Body[] Bodies)
         {
             Bodies[0].Start(new Vector2f(0, 60f));
-            Bodies[1].Start(new Vector2f(60f, 60f));
+            Bodies[1].Start(new Vector2f(60f, 30f));
+            Bodies[2].Start(new Vector2f(10f, 60f));
+            Bodies[3].Start(new Vector2f(30f, 10f));
             // foreach (Body b in Bodies)
             //     b.Start(new Vector2f(0, 60f));
         }
@@ -158,12 +166,14 @@ namespace PhysicsEngine
 
             var potentialCollisions = collisionManager.GetPotentialCollisions();
 
-            if (potentialCollisions.Count > 0)
-                Console.WriteLine("Collision count: " + potentialCollisions.Count);
+            Console.WriteLine("Collision count: " + potentialCollisions.Count);
 
-            if (potentialCollisions.Count == 0)
-                Console.WriteLine("No");
-            
+            foreach (var (a, b) in potentialCollisions)
+            {
+                int indexA = Array.IndexOf(Bodies, a);
+                int indexB = Array.IndexOf(Bodies, b);
+                // Console.WriteLine("Collision between " + indexA + " and " + indexB);
+            }
         }
 
         /**
@@ -174,6 +184,8 @@ namespace PhysicsEngine
         {
             foreach (Body b in Bodies)
                 b.Draw();
+
+            collisionManager.root.Draw();
         }
     }
 }

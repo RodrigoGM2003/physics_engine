@@ -76,7 +76,6 @@ namespace PhysicsEngine
         {   
             RBDrawer.Draw(Position);
 
-            // RectangleShape shape = new RectangleShape(new Vector2f(maxX - minX, maxY - minY));
             RectangleShape shape = new RectangleShape(RBCollider.SweptAABB.Size * PhysicsConstants.PixelsPerMeter);
             shape.Position = new Vector2f(RBCollider.SweptAABB.Left * PhysicsConstants.PixelsPerMeter, RBCollider.SweptAABB.Top * PhysicsConstants.PixelsPerMeter);
             shape.FillColor = Color.Transparent;

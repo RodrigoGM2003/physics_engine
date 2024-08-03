@@ -8,7 +8,7 @@ namespace PhysicsEngine
 {
     public class CollisionManager
     {
-        private BVHNode root; // The root of the bounding volume hierarchy
+        public BVHNode root {get; set;} // The root of the bounding volume hierarchy
 
         /**
          * Constructor for the CollisionManager class
@@ -26,6 +26,7 @@ namespace PhysicsEngine
          */
         private BVHNode BuildBVH(RigidBody[] bodies, int depth)
         {
+
             // If there is only one body, return a node with that body
             if (bodies.Length == 1)
                 return new BVHNode(bodies[0]);
@@ -81,19 +82,49 @@ namespace PhysicsEngine
             // If the node is a leaf, return
             if (node.IsLeaf)
                 return;
+            
 
-            // If the bounding boxes of the left and right nodes intersect, check for potential collisions
-            if (node.Left.BoundingBox.Intersects(node.Right.BoundingBox))
+            // Traverse the left and right subtrees to find potential collisions within them
+            TraverseBVH(node.Left, potentialCollisions);
+            TraverseBVH(node.Right, potentialCollisions);
+
+            // Check for potential collisions between the left and right subtrees
+            CheckPotentialCollisions(node.Left, node.Right, potentialCollisions);
+        }
+
+        /**
+         * Check for potential collisions between two nodes
+         * @param leftNode The left node
+         * @param rightNode The right node
+         * @param potentialCollisions The list of potential collisions
+         */
+        private void CheckPotentialCollisions(BVHNode leftNode, BVHNode rightNode, List<(RigidBody, RigidBody)> potentialCollisions)
+        {
+            // If the bounding boxes of the nodes intersect, check for potential collisions
+            if (leftNode.BoundingBox.Intersects(rightNode.BoundingBox))
             {
                 // If both nodes are leaves, add them to the potential collisions list
-                if (node.Left.IsLeaf && node.Right.IsLeaf)
-                    potentialCollisions.Add((node.Left.rigidBody, node.Right.rigidBody));
+                if (leftNode.IsLeaf && rightNode.IsLeaf)
+                    potentialCollisions.Add((leftNode.rigidBody, rightNode.rigidBody));
                 
-                // Otherwise, traverse the left and right nodes
+                // If one of the nodes is a leaf, check for potential collisions between the leaf and the subtrees of the other node
+                else if (leftNode.IsLeaf)
+                {
+                    CheckPotentialCollisions(leftNode, rightNode.Left, potentialCollisions);
+                    CheckPotentialCollisions(leftNode, rightNode.Right, potentialCollisions);
+                }
+                else if (rightNode.IsLeaf)
+                {
+                    CheckPotentialCollisions(leftNode.Left, rightNode, potentialCollisions);
+                    CheckPotentialCollisions(leftNode.Right, rightNode, potentialCollisions);
+                }
+                // If neither node is a leaf, check for potential collisions between the subtrees of both nodes
                 else
                 {
-                    TraverseBVH(node.Left, potentialCollisions);
-                    TraverseBVH(node.Right, potentialCollisions);
+                    CheckPotentialCollisions(leftNode.Left, rightNode.Left, potentialCollisions);
+                    CheckPotentialCollisions(leftNode.Left, rightNode.Right, potentialCollisions);
+                    CheckPotentialCollisions(leftNode.Right, rightNode.Left, potentialCollisions);
+                    CheckPotentialCollisions(leftNode.Right, rightNode.Right, potentialCollisions);
                 }
             }
         }

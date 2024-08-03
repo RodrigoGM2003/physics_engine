@@ -29,12 +29,34 @@ namespace PhysicsEngine
             rigidBody = null;
             Left = left;
             Right = right;
+
+            float minX = Math.Min(left.BoundingBox.Left, right.BoundingBox.Left);
+            float minY = Math.Min(left.BoundingBox.Top, right.BoundingBox.Top);
+            float maxX = Math.Max(left.BoundingBox.Left + left.BoundingBox.Width, right.BoundingBox.Left + right.BoundingBox.Width);
+            float maxY = Math.Max(left.BoundingBox.Top + left.BoundingBox.Height, right.BoundingBox.Top + right.BoundingBox.Height);
+
             BoundingBox = new FloatRect(
-                Math.Min(left.BoundingBox.Left, right.BoundingBox.Left),
-                Math.Min(left.BoundingBox.Top, right.BoundingBox.Top),
-                Math.Max(left.BoundingBox.Left + left.BoundingBox.Width, right.BoundingBox.Left + right.BoundingBox.Width),
-                Math.Max(left.BoundingBox.Top + left.BoundingBox.Height, right.BoundingBox.Top + right.BoundingBox.Height)
+                minX,
+                minY,
+                maxX - minX, // Width
+                maxY - minY  // Height
             );
+        }
+
+        public void Draw()
+        {
+            RectangleShape shape = new RectangleShape(BoundingBox.Size * PhysicsConstants.PixelsPerMeter);
+            shape.Position = new Vector2f(BoundingBox.Left * PhysicsConstants.PixelsPerMeter, BoundingBox.Top * PhysicsConstants.PixelsPerMeter);
+            shape.FillColor = Color.Transparent;
+            shape.OutlineColor = Color.Green;
+            shape.OutlineThickness = 1;
+
+            RenderWindowManager.Window.Draw(shape);
+
+            if (Left != null)
+                Left.Draw();
+            if (Right != null)
+                Right.Draw();
         }
     }
 }
