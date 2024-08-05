@@ -18,10 +18,11 @@ namespace PhysicsEngine
 
         public bool IsLeaf => rigidBody != null;
 
-        public BVHNode(RigidBody rigidBody)
+        public BVHNode(RigidBody rigidBody, bool discrete)
         {
             this.rigidBody = rigidBody;
-            BoundingBox = rigidBody.RBCollider.SweptAABB;
+
+            BoundingBox = discrete ? rigidBody.RBCollider.BoundingBox : rigidBody.RBCollider.SweptAABB;
         }
 
         public BVHNode(BVHNode left, BVHNode right)

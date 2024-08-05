@@ -64,7 +64,7 @@ namespace PhysicsEngine
         public static float CalculateToI(in CircleCollider a, in CircleCollider b, Vector2f vA, Vector2f vB){
             //Calculate the relative velocity and position
             Vector2f relativeVelocity = vA - vB;
-            Vector2f relativePosition = a.Position - b.Position;
+            Vector2f relativePosition = a.LastPosition - b.LastPosition;
 
             //Calculate the combined radius
             float combinedRadius = a.Radius + b.Radius;

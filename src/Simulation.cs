@@ -19,7 +19,8 @@ namespace PhysicsEngine
         private static Clock clock = null!; // The clock to keep track of time
         private static float accumulatedTime = 0.0f; // The time that has accumulated since the last frame
         private static CollisionManager collisionManager;
-        private static float speedFactor = 1.0f; // The speed factor of the simulation
+        private static CollisionResolver collisionResolver;
+        private static float speedFactor = 1f; // The speed factor of the simulation
 
 
         /**
@@ -42,8 +43,9 @@ namespace PhysicsEngine
                 radius: 1f, 
                 window: window, 
                 color: Color.White, 
-                mass: 1, 
-                velocity: new Vector2f(10, -20)
+                mass: 10000000000, 
+                velocity: new Vector2f(0, -20),
+                elasticity: 1.0f
             );
 
             Bodies[1] = new CircleRigidBody(
@@ -51,7 +53,8 @@ namespace PhysicsEngine
                 window, 
                 color: Color.Green, 
                 mass: 1, 
-                velocity: new Vector2f(-10, -20)
+                velocity: new Vector2f(-10, -20),
+                elasticity: 1.0f
             );
 
             // Bodies[2] = new CircleRigidBody(
@@ -94,8 +97,8 @@ namespace PhysicsEngine
             // Bodies[4] = new RectangleRigidBody(size: new Vector2f(80, 20), window: window, color: Color.Green, 
             //                                 mass: 1000, velocity: new Vector2f(5, -10));
 
-
-            collisionManager = new CollisionManager(Bodies.Cast<RigidBody>().ToArray());
+            collisionResolver = new DCD();
+            collisionManager = new CollisionManager(Bodies.Cast<RigidBody>().ToArray(), discrete: collisionResolver.Discrete);
             // Start the bodies
             Start(ref Bodies);
 
@@ -177,7 +180,8 @@ namespace PhysicsEngine
          */
         private static void Start(ref Body[] Bodies)
         {
-            Bodies[0].Start(new Vector2f(0, 60f));
+            // Bodies[0].Start(new Vector2f(0, 60f));29,027853
+            Bodies[0].Start(new Vector2f((float)29.027853, 60f));
             Bodies[1].Start(new Vector2f(60f, 60f));
             // Bodies[2].Start(new Vector2f(10f, 60f));
             // Bodies[3].Start(new Vector2f(30f, 10f));
@@ -210,18 +214,9 @@ namespace PhysicsEngine
             // }
 
             foreach (var (bodyA, bodyB) in potentialCollisions)
-            {
                 if (bodyA is CircleRigidBody circleA && bodyB is CircleRigidBody circleB)
-                {
-                    Vector2f velocityA = circleA.Velocity;
-                    Vector2f velocityB = circleB.Velocity;
-
-                    float toi = Collider.CalculateToI(circleA.RBCollider as CircleCollider, circleB.RBCollider as CircleCollider, velocityA, velocityB);
-
-                    if (toi >= 0 && toi < 1)
-                        CollisionResolver.ResolveCollision(circleA, circleB, toi, deltaTime);
-                }
-            }
+                    collisionResolver.ResolveCollision(circleA, circleB);
+            
         }
 
         /**

@@ -9,8 +9,9 @@ namespace PhysicsEngine
     /**
     * Class for resolving collisions between rigid bodies
     */
-    public class CollisionResolver
+    public class CCD : CollisionResolver
     {
+        public override bool Discrete => false; // Continuous collision detection is enabled
         /**
         * Method to resolve a collision between two circle rigid bodies
         * @param circleA The first circle rigid body
@@ -18,13 +19,13 @@ namespace PhysicsEngine
         * @param toi The time of impact
         * @param deltaTime The change in time since the last frame
         */
-        public static void ResolveCollision(CircleRigidBody circleA, CircleRigidBody circleB, float toi, float deltaTime)
+        public override void ResolveCollision(CircleRigidBody circleA, CircleRigidBody circleB)//, float toi, float deltaTime)
         {
             circleA.Velocity = Vector2fExtensions.Hadmard(circleA.Velocity, new Vector2f(-1, 1));
             circleB.Velocity = Vector2fExtensions.Hadmard(circleB.Velocity, new Vector2f(-1, 1));
             // // Move the bodies to the point of collision
-            // Vector2f newPosA = circleA.Position + circleA.Velocity * toi * deltaTime;
-            // Vector2f newPosB = circleB.Position + circleB.Velocity * toi * deltaTime;
+            // Vector2f newPosA = circleA.RBCollider.LastPosition + circleA.Velocity * toi * deltaTime;
+            // Vector2f newPosB = circleB.RBCollider.LastPosition + circleB.Velocity * toi * deltaTime;
 
             // circleA.RBCollider.UpdatePosition(newPosA, circleA.Rotation);
             // circleB.RBCollider.UpdatePosition(newPosB, circleB.Rotation);
@@ -53,8 +54,8 @@ namespace PhysicsEngine
             // // Apply impulse
             // Vector2f impulse = impulseScalar * collisionNormal;
 
-            // circleA.Velocity -= impulse / circleA.Mass;
-            // circleB.Velocity += impulse / circleB.Mass;
+            // circleA.ApplyImpulse(-impulse);
+            // circleB.ApplyImpulse(impulse);
 
             // // Angular velocity adjustments
             // Vector2f contactPointA = newPosA + collisionNormal * circleA.Radius;

@@ -9,13 +9,15 @@ namespace PhysicsEngine
     public class CollisionManager
     {
         public BVHNode root {get; set;} // The root of the bounding volume hierarchy
+        public bool Discrete {get; set;} // Whether continuous collision detection is enabled
 
         /**
          * Constructor for the CollisionManager class
          * @param bodies The bodies in the scene
          */
-        public CollisionManager(RigidBody[] bodies)
+        public CollisionManager(RigidBody[] bodies, bool discrete)
         {
+            Discrete = discrete;
             root = BuildBVH(bodies, 0);
         }
 
@@ -29,7 +31,7 @@ namespace PhysicsEngine
 
             // If there is only one body, return a node with that body
             if (bodies.Length == 1)
-                return new BVHNode(bodies[0]);
+                return new BVHNode(bodies[0], Discrete);
 
             // Sort the bodies based on the axis
             int axis = depth % 2;
