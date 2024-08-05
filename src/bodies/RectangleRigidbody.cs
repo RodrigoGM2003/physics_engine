@@ -29,9 +29,14 @@ namespace PhysicsEngine
         public RectangleRigidBody(Vector2f size, in RenderWindow window, float? rotation = 0, Color? color = null, float? elasticity = null, float? friction = null,
                                 float? mass = null, Vector2f? velocity = null, Vector2f? acceleration = null, float? angularVelocity = null)
         : base(
-            new RectangleCollider(
+            new PolygonCollider(
                 position: new Vector2f(0, 0), 
-                size: size, 
+                vertices: new Vector2f[] {
+                    new Vector2f(-size.X / 2, -size.Y / 2),
+                    new Vector2f(size.X / 2, -size.Y / 2),
+                    new Vector2f(size.X / 2, size.Y / 2),
+                    new Vector2f(-size.X / 2, size.Y / 2)
+                }, 
                 elasticity: elasticity, 
                 friction: friction, 
                 rotation: rotation

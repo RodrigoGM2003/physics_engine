@@ -13,11 +13,11 @@ namespace PhysicsEngine
     {
         public Collider RBCollider { get; protected set; }
         public Drawer RBDrawer { get; protected set; }
-        public Vector2f Velocity { get; protected set; } // Velocity in m/s
-        public Vector2f Acceleration { get; protected set; } // Acceleration in m/s^2
-        public float AngularVelocity { get; protected set; } // Angular velocity in rads/s
-        public float AngularAcceleration { get; protected set; } // Angular acceleration in rads/s^2
-        public float Mass { get; protected set; } // Mass in kg
+        public Vector2f Velocity { get; set; } // Velocity in m/s
+        public Vector2f Acceleration { get; set; } // Acceleration in m/s^2
+        public float AngularVelocity { get; set; } // Angular velocity in rads/s
+        public float AngularAcceleration { get; set; } // Angular acceleration in rads/s^2
+        public float Mass { get; set; } // Mass in kg
 
 
         /**
@@ -68,6 +68,8 @@ namespace PhysicsEngine
             AngularVelocity += AngularAcceleration * deltaTime;
             // AngularVelocity *= (1 - AngularDamping * deltaTime);
             Rotation += AngularVelocity * deltaTime;
+            if (Rotation > MathF.PI * 2)
+                Rotation -= MathF.PI * 2;
 
             // Apply gravity if the object has mass
             if (Mass > 0)

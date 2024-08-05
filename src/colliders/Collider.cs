@@ -60,13 +60,44 @@ namespace PhysicsEngine
             SweptAABB = new FloatRect(minX, minY, maxX - minX, maxY - minY);
         }
 
-        /**
-         * Resolve the collision between the object and another object
-         * @param other The collider to resolve the collision with
-         */
-        public abstract void ResolveCollision(in CircleCollider other);
-        public abstract void ResolveCollision(in RectangleCollider other);
-        public abstract void ResolveCollision(in PolygonCollider other);
 
+        public static float CalculateToI(in CircleCollider a, in CircleCollider b, Vector2f vA, Vector2f vB){
+            //Calculate the relative velocity and position
+            Vector2f relativeVelocity = vA - vB;
+            Vector2f relativePosition = a.Position - b.Position;
+
+            //Calculate the combined radius
+            float combinedRadius = a.Radius + b.Radius;
+
+            //Solve the quadratic equation
+            //v1.X * v2.X + v1.Y * v2.Y;
+            float aCoeff = relativeVelocity.Dot(relativeVelocity);
+            float bCoeff = 2 * relativePosition.Dot(relativeVelocity);
+            float cCoeff =  relativePosition.Dot(relativePosition) - combinedRadius * combinedRadius;
+            float discriminant = bCoeff * bCoeff - 4 * aCoeff * cCoeff;
+
+            //If the discriminant is negative, there is no collision
+            if (discriminant < 0)
+                return float.MaxValue;
+
+            //Calculate the time of impact
+            float sqrtDiscriminant = MathF.Sqrt(discriminant);
+            float t1 = (-bCoeff - sqrtDiscriminant) / (2 * aCoeff);
+            float t2 = (-bCoeff + sqrtDiscriminant) / (2 * aCoeff);
+
+            // Return the smallest positive time of impact
+            if (t1 >= 0 && t1 <= 1){
+                Console.WriteLine("Ladys and gentlemen, we got him");
+                return t1;
+            }
+
+            else if (t2 >= 0 && t2 <= 1){
+                Console.WriteLine("Gadys and lentlemen, we got him");
+                return t2;
+            }
+
+            //If there is no collision, return infinity
+            return float.MaxValue;
+        }
     }
 }

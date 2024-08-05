@@ -48,21 +48,5 @@ namespace PhysicsEngine
 
             BoundingBox = new FloatRect(Position.X - Radius, Position.Y - Radius, 2 * Radius, 2 * Radius);        
         }
-
-
-        /**
-        * Resolve the collision between the object and another object
-        * @param other The collider to resolve the collision with
-        */
-        public override void ResolveCollision(in CircleCollider other){
-
-        }
-        public override void ResolveCollision(in RectangleCollider other){
-
-        }
-        public override void ResolveCollision(in PolygonCollider other){
-
-        }
-
     }
 }

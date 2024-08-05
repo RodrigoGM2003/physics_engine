@@ -31,52 +31,9 @@ namespace PhysicsEngine
             rotation: rotation
         )
         {
-            Vertices = vertices;
+            Vertices = vertices;    
 
-            //Apply the rotation to the vertices
-            if (rotation != 0 && rotation != null){
-                float cos = (float)Math.Cos(rotation.Value);
-                float sin = (float)Math.Sin(rotation.Value);
-
-                for (int i = 0; i < vertices.Length; i++)
-                {
-                    float x = vertices[i].X;
-                    float y = vertices[i].Y;
-                    vertices[i] = new Vector2f(x * cos - y * sin, x * sin + y * cos);
-                }
-            }
-
-            //Calculate the largest distance from a vertex to the center
-            maxDistance = 0;
-            foreach (Vector2f vertex in Vertices){
-                float distance = (float)Math.Sqrt(Math.Pow(vertex.X, 2) + Math.Pow(vertex.Y, 2));
-                if (distance > maxDistance)
-                    maxDistance = distance;
-            }
-
-            //Calculate the bounding box
-            float minX = float.MaxValue, minY = float.MaxValue;
-            float maxX = float.MinValue, maxY = float.MinValue;
-
-            //Calculate AABB
-            foreach (Vector2f vertex in Vertices){
-                if (vertex.X < minX)
-                    minX = vertex.X;
-                if (vertex.X > maxX)
-                    maxX = vertex.X;
-                if (vertex.Y < minY)
-                    minY = vertex.Y;
-                if (vertex.Y > maxY)
-                    maxY = vertex.Y;
-            }
-
-            // maxDistance = (float)Math.Sqrt(Math.Pow(maxX - minX, 2) + Math.Pow(maxY - minY, 2));
-
-            //Expand the bounding box
-            float width = maxX - minX;
-            float height = maxY - minY;
-            // BoundingBox = new FloatRect(Position.X - width / 2, Position.Y - height / 2, width, height);
-            BoundingBox = new FloatRect(Position.X - maxDistance, Position.Y - maxDistance, maxDistance, maxDistance);
+            UpdateBoundingBox();
         }
 
         /**
@@ -90,25 +47,37 @@ namespace PhysicsEngine
             LastRotation = Rotation;
             Rotation = rotation;
 
+            UpdateBoundingBox();
+        }
+
+        /**
+        * Update the bounding box of the object
+        */
+        private void UpdateBoundingBox(){
+            Vector2f[] newVertices = new Vector2f[Vertices.Length];
+
             //Apply the rotation to the vertices
-            if (rotation != 0){
-                float cos = (float)Math.Cos(rotation);
-                float sin = (float)Math.Sin(rotation);
+            float cos = (float)Math.Cos(Rotation);
+            float sin = (float)Math.Sin(Rotation);
 
-                for (int i = 0; i < Vertices.Length; i++)
-                {
-                    float x = Vertices[i].X;
-                    float y = Vertices[i].Y;
-                    Vertices[i] = new Vector2f(x * cos - y * sin, x * sin + y * cos);
-                }
+            for (int i = 0; i < Vertices.Length; i++)
+            {
+                float x = Vertices[i].X;
+                float y = Vertices[i].Y;
+
+                // Apply the 2D rotation matrix
+                newVertices[i] = new Vector2f(
+                    x * cos - y * sin,  // new x-coordinate
+                    x * sin + y * cos   // new y-coordinate
+                );
             }
-
+            
             //Calculate the bounding box
             float minX = float.MaxValue, minY = float.MaxValue;
             float maxX = float.MinValue, maxY = float.MinValue;
 
             //Calculate AABB
-            foreach (Vector2f vertex in Vertices){
+            foreach (Vector2f vertex in newVertices){
                 if (vertex.X < minX)
                     minX = vertex.X;
                 if (vertex.X > maxX)
@@ -122,23 +91,7 @@ namespace PhysicsEngine
             //Expand the bounding box
             float width = maxX - minX;
             float height = maxY - minY;
-            // BoundingBox = new FloatRect(Position.X - width / 2, Position.Y - height / 2, width, height);
-            BoundingBox = new FloatRect(Position.X - maxDistance, Position.Y - maxDistance, maxDistance, maxDistance);
+            BoundingBox = new FloatRect(Position.X - width / 2, Position.Y - height / 2, width, height);
         }
-
-        /**
-        * Resolve the collision between the object and another object
-        * @param other The collider to resolve the collision with
-        */
-        public override void ResolveCollision(in CircleCollider other){
-
-        }
-        public override void ResolveCollision(in RectangleCollider other){
-
-        }
-        public override void ResolveCollision(in PolygonCollider other){
-
-        }
-
     }
 }

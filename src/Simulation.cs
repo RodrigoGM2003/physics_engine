@@ -36,29 +36,57 @@ namespace PhysicsEngine
 
 
             // Create the bodies
-            Body[] Bodies = new Body[5];
+            Body[] Bodies = new Body[2];
             
-            Bodies[0] = new CircleRigidBody(radius: 1f, window: window, color: Color.White, 
-                                            mass: 1, velocity: new Vector2f(10, -20));
-
-            Bodies[1] = new CircleRigidBody(radius: 1f, window: window, color: Color.Green, 
-                                mass: 1, velocity: new Vector2f(-10, -20));
-
-            Bodies[2] = new CircleRigidBody(radius: 2f, window: window, color: Color.Magenta, 
-                                            mass: 1, velocity: new Vector2f(10, -30));
-
-            Bodies[3] = new CircleRigidBody(radius: 3f, window: window, color: Color.Cyan, 
-                                mass: 1, velocity: new Vector2f(0, 0));
-
-            Bodies[4] = new RectangleRigidBody(
-                size: new Vector2f(4, 7), 
+            Bodies[0] = new CircleRigidBody(
+                radius: 1f, 
                 window: window, 
-                color: Color.Red, 
+                color: Color.White, 
                 mass: 1, 
-                velocity: new Vector2f(20, -20),
-                angularVelocity: 3,
-                rotation: 2
+                velocity: new Vector2f(10, -20)
             );
+
+            Bodies[1] = new CircleRigidBody(
+                radius: 1f, window: 
+                window, 
+                color: Color.Green, 
+                mass: 1, 
+                velocity: new Vector2f(-10, -20)
+            );
+
+            // Bodies[2] = new CircleRigidBody(
+            //     radius: 2f, 
+            //     window: window, 
+            //     color: Color.Magenta,                             
+            //     mass: 1, 
+            //     velocity: new Vector2f(10, -30)
+            // );
+
+            // Bodies[3] = new CircleRigidBody(
+            //     radius: 3f, 
+            //     window: window, 
+            //     color: Color.Cyan, 
+            //     mass: 1, velocity: new Vector2f(0, 0)
+            // );
+
+            // Bodies[4] = new RectangleRigidBody(
+            //     size: new Vector2f(4, 7),
+            //     window: window, 
+            //     color: Color.Yellow, 
+            //     mass: 1, 
+            //     velocity: new Vector2f(20, -20),
+            //     angularVelocity: 1
+            // );
+
+            // Bodies[4] = new RectangleRigidBody(
+            //     size: new Vector2f(4, 7), 
+            //     window: window, 
+            //     color: Color.Red, 
+            //     mass: 1, 
+            //     velocity: new Vector2f(20, -20),
+            //     angularVelocity: 3,
+            //     rotation: 2
+            // );
 
             // Bodies[3] = new CircleRigidBody(radius: 30, window: window, color: Color.Blue, 
             //                                 mass: 10, velocity: new Vector2f(4, -10));
@@ -150,10 +178,10 @@ namespace PhysicsEngine
         private static void Start(ref Body[] Bodies)
         {
             Bodies[0].Start(new Vector2f(0, 60f));
-            Bodies[1].Start(new Vector2f(60f, 30f));
-            Bodies[2].Start(new Vector2f(10f, 60f));
-            Bodies[3].Start(new Vector2f(30f, 10f));
-            Bodies[4].Start(new Vector2f(0f, 30f));
+            Bodies[1].Start(new Vector2f(60f, 60f));
+            // Bodies[2].Start(new Vector2f(10f, 60f));
+            // Bodies[3].Start(new Vector2f(30f, 10f));
+            // Bodies[4].Start(new Vector2f(0f, 30f));
             // Bodies[5].Start(new Vector2f(90f, 30f));
             // foreach (Body b in Bodies)
             //     b.Start(new Vector2f(0, 60f));
@@ -172,13 +200,27 @@ namespace PhysicsEngine
 
             var potentialCollisions = collisionManager.GetPotentialCollisions();
 
-            Console.WriteLine("Collision count: " + potentialCollisions.Count);
+            // Debugging
+            // Console.WriteLine("Collision count: " + potentialCollisions.Count);
+            // foreach (var (a, b) in potentialCollisions)
+            // {
+            //     int indexA = Array.IndexOf(Bodies, a);
+            //     int indexB = Array.IndexOf(Bodies, b);
+            //     Console.WriteLine("Collision between " + indexA + " and " + indexB);
+            // }
 
-            foreach (var (a, b) in potentialCollisions)
+            foreach (var (bodyA, bodyB) in potentialCollisions)
             {
-                int indexA = Array.IndexOf(Bodies, a);
-                int indexB = Array.IndexOf(Bodies, b);
-                // Console.WriteLine("Collision between " + indexA + " and " + indexB);
+                if (bodyA is CircleRigidBody circleA && bodyB is CircleRigidBody circleB)
+                {
+                    Vector2f velocityA = circleA.Velocity;
+                    Vector2f velocityB = circleB.Velocity;
+
+                    float toi = Collider.CalculateToI(circleA.RBCollider as CircleCollider, circleB.RBCollider as CircleCollider, velocityA, velocityB);
+
+                    if (toi >= 0 && toi < 1)
+                        CollisionResolver.ResolveCollision(circleA, circleB, toi, deltaTime);
+                }
             }
         }
 
