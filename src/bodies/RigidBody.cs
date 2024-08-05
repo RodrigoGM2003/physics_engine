@@ -15,23 +15,31 @@ namespace PhysicsEngine
         public Drawer RBDrawer { get; protected set; }
         public Vector2f Velocity { get; protected set; } // Velocity in m/s
         public Vector2f Acceleration { get; protected set; } // Acceleration in m/s^2
+        public float AngularVelocity { get; protected set; } // Angular velocity in rads/s
+        public float AngularAcceleration { get; protected set; } // Angular acceleration in rads/s^2
         public float Mass { get; protected set; } // Mass in kg
 
 
         /**
         * Constructor for the RigidBody class
-        * @param mass The mass of the object in kg
         * @param collider The collider for the object
         * @param drawer The drawer for the object
+        * @param rotation The rotation of the object in rads
+        * @param velocity The velocity of the object in m/s
+        * @param acceleration The acceleration of the object in m/s^2
+        * @param mass The mass of the object in kg
+        * @param angularVelocity The angular velocity of the object in rads/s
         */
-        public RigidBody(in Collider collider, in Drawer drawer, Vector2f? velocity = null, 
-                        Vector2f? acceleration = null, float? mass = null)
+        public RigidBody(in Collider collider, in Drawer drawer, float? rotation = 0, Vector2f? velocity = null, 
+                        Vector2f? acceleration = null, float? mass = null, float? angularVelocity = null)
         {
             Position = new Vector2f(0, 0);
+            Rotation = rotation ?? 0;
             RBCollider = collider;
             RBDrawer = drawer;
             Velocity = velocity ?? new Vector2f(0, 0);
             Acceleration = acceleration ?? new Vector2f(0, 0);
+            AngularVelocity = angularVelocity ?? 0;
             Mass = mass ?? 1;
         }
 
@@ -42,7 +50,7 @@ namespace PhysicsEngine
         public override void Start(Vector2f position)
         {
             Position = position;
-            RBCollider.UpdatePosition(Position);
+            RBCollider.UpdatePosition(Position, Rotation);
             RBCollider.UpdateSweptAABB();
         }
 
@@ -57,12 +65,16 @@ namespace PhysicsEngine
             Position += Velocity * deltaTime;
             Acceleration = new Vector2f(0, 0);
 
+            AngularVelocity += AngularAcceleration * deltaTime;
+            // AngularVelocity *= (1 - AngularDamping * deltaTime);
+            Rotation += AngularVelocity * deltaTime;
+
             // Apply gravity if the object has mass
             if (Mass > 0)
                 ApplyAcceleration(PhysicsConstants.GravityVector);
             
             //Update the colliders position
-            RBCollider.UpdatePosition(Position);
+            RBCollider.UpdatePosition(Position, Rotation);
             RBCollider.UpdateSweptAABB();
         }
 
@@ -74,7 +86,7 @@ namespace PhysicsEngine
         */
         public override void Draw()
         {   
-            RBDrawer.Draw(Position);
+            RBDrawer.Draw(Position, Rotation);
 
             RectangleShape shape = new RectangleShape(RBCollider.SweptAABB.Size * PhysicsConstants.PixelsPerMeter);
             shape.Position = new Vector2f(RBCollider.SweptAABB.Left * PhysicsConstants.PixelsPerMeter, RBCollider.SweptAABB.Top * PhysicsConstants.PixelsPerMeter);

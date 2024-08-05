@@ -50,7 +50,7 @@ namespace PhysicsEngine
             Position += Velocity * deltaTime;
             Acceleration = new Vector2f(0, 0);
 
-            SBCollider.UpdatePosition(Position);
+            SBCollider.UpdatePosition(Position, 0);
         }
 
         /**
@@ -63,7 +63,7 @@ namespace PhysicsEngine
         {
             if (SBDrawer != null){
                 // Convert the floating-point position to pixel position            
-                SBDrawer.Draw(Position);
+                SBDrawer.Draw(Position, 0);
             }
         }
     }

@@ -15,14 +15,20 @@ namespace PhysicsEngine
         public float Radius { get; protected set; } // The radius of the circle
 
         /**
-         * Base constructor for CircleCollider class
-         * @param position The position of the object in the scene
-         * @param radius The radius of the object
-         * @param elasticity The elasticity of the object
-         * @param friction The friction of the object
-         */
-        public CircleCollider(Vector2f position, float radius, float? elasticity = null, float? friction = null)
-        : base(position, elasticity, friction)
+        * Base constructor for CircleCollider class
+        * @param position The position of the object in the scene
+        * @param radius The radius of the object
+        * @param rotation The rotation of the object
+        * @param elasticity The elasticity of the object
+        * @param friction The friction of the object
+        */
+        public CircleCollider(Vector2f position, float radius, float? rotation = 0, float? elasticity = null, float? friction = null)
+        : base(
+            position: position, 
+            elasticity: elasticity, 
+            friction: friction, 
+            rotation: rotation
+        )
         {
             Radius = radius;
 
@@ -30,21 +36,24 @@ namespace PhysicsEngine
         }
 
         /**
-         * Update the position of the object
-         * @param position The new position of the object
-         */
-        public override void UpdatePosition(Vector2f position){
+        * Update the position of the object
+        * @param position The new position of the object
+        */
+        public override void UpdatePosition(Vector2f position, float rotation){
             LastPosition = Position;
-            Position = position;            
+            Position = position;
+
+            LastRotation = Rotation;
+            Rotation = rotation;         
 
             BoundingBox = new FloatRect(Position.X - Radius, Position.Y - Radius, 2 * Radius, 2 * Radius);        
         }
 
 
         /**
-         * Resolve the collision between the object and another object
-         * @param other The collider to resolve the collision with
-         */
+        * Resolve the collision between the object and another object
+        * @param other The collider to resolve the collision with
+        */
         public override void ResolveCollision(in CircleCollider other){
 
         }

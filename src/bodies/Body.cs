@@ -12,6 +12,7 @@ namespace PhysicsEngine
     public abstract class Body
     {
         public Vector2f Position { get; protected set; } // Position in m
+        public float Rotation { get; protected set; } // Rotation in grads
 
 
         /**

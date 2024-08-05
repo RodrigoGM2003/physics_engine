@@ -15,6 +15,8 @@ namespace PhysicsEngine
     {
         public Vector2f Position { get; protected set; } // Position in m
         public Vector2f LastPosition { get; protected set; } // Last position in m (used to calculate swept AABB)
+        public float Rotation { get; protected set; } // Rotation in rad
+        public float LastRotation { get; protected set; } // Last rotation in rad (used to calculate swept AABB)
         public float Elasticity { get; protected set; } // The elasticity of the object
         public float Friction { get; protected set; } // The friction of the object
         public FloatRect BoundingBox { get; protected set; } // The bounding box of the object (used to increase performance in collision detection)
@@ -26,11 +28,14 @@ namespace PhysicsEngine
          * @param elasticity The elasticity of the object
          * @param friction The friction of the object
          */
-        protected Collider(Vector2f position, float? elasticity = null, float? friction = null)
+        protected Collider(Vector2f position, float? rotation = 0, float? elasticity = null, float? friction = null)
         {
             Position = position;
             LastPosition = position;
 
+            Rotation = rotation ?? 0;
+            LastRotation = rotation ?? 0;
+            
             Elasticity = elasticity ?? PhysicsConstants.DefaultElasticity;
             Friction = friction ?? PhysicsConstants.DefaultFriction;
         }
@@ -39,7 +44,7 @@ namespace PhysicsEngine
          * Update the position of the object
          * @param position The new position of the object
          */
-        public abstract void UpdatePosition(Vector2f position);
+        public abstract void UpdatePosition(Vector2f position, float rotation);
         
 
         /**

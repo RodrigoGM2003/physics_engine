@@ -12,7 +12,7 @@ namespace PhysicsEngine
         public const float FrameRate = 144.0f; // The frame rate of the simulation
         public const float AspectRatio = 2.0f / 1.0f; // The aspect ratio of the window
         
-        public const float ColliderExpansion = 1.5f;
+
 
         public const uint CirclePointCount = 30;  
     }

@@ -13,13 +13,13 @@ namespace PhysicsEngine
     }
     class Simulation
     {
-        // private static readonly float AspectRatio = 16.0f / 9.0f;  // Desired aspect ratio (e.g., 4:3)
         private static float AspectRatio = ComputingConstants.AspectRatio;  // Desired aspect ratio (e.g., 4:3)
         private static readonly float FrameTime = 1.0f / ComputingConstants.FrameRate;   // Frame time for 60 FPS
         private static RenderWindow window = null!; // The window to draw to
         private static Clock clock = null!; // The clock to keep track of time
         private static float accumulatedTime = 0.0f; // The time that has accumulated since the last frame
         private static CollisionManager collisionManager;
+        private static float speedFactor = 1.0f; // The speed factor of the simulation
 
 
         /**
@@ -36,25 +36,29 @@ namespace PhysicsEngine
 
 
             // Create the bodies
-            Body[] Bodies = new Body[4];
+            Body[] Bodies = new Body[5];
             
             Bodies[0] = new CircleRigidBody(radius: 1f, window: window, color: Color.White, 
                                             mass: 1, velocity: new Vector2f(10, -20));
 
-            Bodies[1] = new CircleRigidBody(radius: 1f, window: window, color: Color.White, 
+            Bodies[1] = new CircleRigidBody(radius: 1f, window: window, color: Color.Green, 
                                 mass: 1, velocity: new Vector2f(-10, -20));
 
-            Bodies[2] = new CircleRigidBody(radius: 2f, window: window, color: Color.White, 
+            Bodies[2] = new CircleRigidBody(radius: 2f, window: window, color: Color.Magenta, 
                                             mass: 1, velocity: new Vector2f(10, -30));
 
-            Bodies[3] = new CircleRigidBody(radius: 3f, window: window, color: Color.White, 
+            Bodies[3] = new CircleRigidBody(radius: 3f, window: window, color: Color.Cyan, 
                                 mass: 1, velocity: new Vector2f(0, 0));
 
-            // Bodies[1] = new RectangleRigidBody(size: new Vector2f(4, 2), window: window, color: Color.Red, 
-            //                                 mass: 1, velocity: new Vector2f(20, -20));
-
-            // Bodies[2] = new PolygonRigidBody(vertices: new Vector2f[] { new Vector2f(0, 0), new Vector2f(2, 0), new Vector2f(1, 2) }, 
-            //                                 window: window, color: Color.Yellow, mass: 1, velocity: new Vector2f(30, -20));
+            Bodies[4] = new RectangleRigidBody(
+                size: new Vector2f(4, 7), 
+                window: window, 
+                color: Color.Red, 
+                mass: 1, 
+                velocity: new Vector2f(20, -20),
+                angularVelocity: 3,
+                rotation: 2
+            );
 
             // Bodies[3] = new CircleRigidBody(radius: 30, window: window, color: Color.Blue, 
             //                                 mass: 10, velocity: new Vector2f(4, -10));
@@ -78,10 +82,10 @@ namespace PhysicsEngine
                 accumulatedTime += deltaTime;
 
                 // Update the scene
-                while (accumulatedTime >= FrameTime)
+                while (accumulatedTime >= FrameTime )
                 {
                     window.DispatchEvents();
-                    Update(ref Bodies, FrameTime);
+                    Update(ref Bodies, FrameTime * speedFactor);
                     accumulatedTime -= FrameTime;
                 }
 
@@ -149,6 +153,8 @@ namespace PhysicsEngine
             Bodies[1].Start(new Vector2f(60f, 30f));
             Bodies[2].Start(new Vector2f(10f, 60f));
             Bodies[3].Start(new Vector2f(30f, 10f));
+            Bodies[4].Start(new Vector2f(0f, 30f));
+            // Bodies[5].Start(new Vector2f(90f, 30f));
             // foreach (Body b in Bodies)
             //     b.Start(new Vector2f(0, 60f));
         }

@@ -14,16 +14,39 @@ namespace PhysicsEngine
         public Vector2f Size { get; protected set; }
 
         /**
-        * Constructor for the RectangleRigidBody class
-        * @param mass The mass of the object in kg
-        * @param collider The collider for the object
-        * @param drawer The drawer for the object
+        * Constructor for the CircleRigidBody class
+        * @param size The size of the rectangle in meters
+        * @param window The window to draw the circle in
+        * @param rotation The rotation of the circle in rads
+        * @param color The color of the circle
+        * @param elasticity The elasticity of the circle
+        * @param friction The friction of the circle
+        * @param mass The mass of the circle in kg
+        * @param velocity The velocity of the circle in m/s
+        * @param acceleration The acceleration of the circle in m/s^2
+        * @param angularVelocity The angular velocity of the circle in rads/s
         */
-        public RectangleRigidBody(Vector2f size, in RenderWindow window, Color? color = null, float? elasticity = null, float? friction = null,
-                                float? mass = null, Vector2f? velocity = null, Vector2f? acceleration = null)
-        : base(new RectangleCollider(new Vector2f(0, 0), size, elasticity, friction), 
-            new RectangleDrawer(window, size * PhysicsConstants.PixelsPerMeter, color), 
-            mass: mass, velocity: velocity, acceleration: acceleration)
+        public RectangleRigidBody(Vector2f size, in RenderWindow window, float? rotation = 0, Color? color = null, float? elasticity = null, float? friction = null,
+                                float? mass = null, Vector2f? velocity = null, Vector2f? acceleration = null, float? angularVelocity = null)
+        : base(
+            new RectangleCollider(
+                position: new Vector2f(0, 0), 
+                size: size, 
+                elasticity: elasticity, 
+                friction: friction, 
+                rotation: rotation
+            ), 
+            new RectangleDrawer(
+                _window: window, 
+                size: size * PhysicsConstants.PixelsPerMeter, 
+                color: color
+            ), 
+            mass: mass, 
+            velocity: velocity, 
+            acceleration: acceleration, 
+            rotation: rotation,
+            angularVelocity: angularVelocity 
+        )
         {
             Size = size;
         }
