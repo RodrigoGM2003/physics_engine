@@ -51,7 +51,7 @@ namespace PhysicsEngine
             angularVelocity: angularVelocity
         )
         {
-            Radius = radius * PhysicsConstants.PixelsPerMeter;
+            Radius = radius;
         }
     }
 }

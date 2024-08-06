@@ -21,19 +21,31 @@ namespace PhysicsEngine
         */
         public override void ResolveCollision(CircleRigidBody circleA, CircleRigidBody circleB)
         {
-            Console.WriteLine("Position A: " + circleA.Position + " Position B: " + circleB.Position);
             Vector2f collisionNormal = circleA.Position - circleB.Position;
             float distance = collisionNormal.Length();
             collisionNormal /= distance; // Normalize the vector
-            Console.WriteLine("Collision Normal: " + collisionNormal);
+
+            if (distance > circleA.Radius + circleB.Radius)
+                return;
+
+            // Eliminate overlap
+            float overlap = (circleA.Radius + circleB.Radius) - distance;
+            circleA.UpdatePosition(circleA.Position + ( overlap / 2 * collisionNormal));
+            circleB.UpdatePosition(circleB.Position - ( overlap / 2 * collisionNormal));
 
             // Calculate relative velocity
             Vector2f relativeVelocity = circleA.Velocity - circleB.Velocity;
-            Console.WriteLine("Relative velocity: " + relativeVelocity);
+
+            // Calculate relative tangential velocity
+            Vector2f tangentialVelocityA = new Vector2f(circleA.AngularVelocity * circleA.Radius * collisionNormal.Y, 
+                                                        -circleA.AngularVelocity * circleA.Radius * collisionNormal.X);
+            Vector2f tangentialVelocityB = new Vector2f(-circleB.AngularVelocity * circleB.Radius * collisionNormal.Y, 
+                                                        circleB.AngularVelocity * circleB.Radius * collisionNormal.X);
+            Vector2f relativeTangentialVelocity = tangentialVelocityA - tangentialVelocityB;
+
 
             // Calculate relative velocity in terms of the normal direction
             float velocityAlongNormal = relativeVelocity.Dot(collisionNormal);
-            Console.WriteLine("Velocity along normal: " + velocityAlongNormal);
 
             // Do not resolve if velocities are separating
             if (velocityAlongNormal > 0)
@@ -41,32 +53,25 @@ namespace PhysicsEngine
 
             // Calculate restitution
             float restitution = MathF.Min(circleA.RBCollider.Elasticity, circleB.RBCollider.Elasticity);
+            float friction = MathF.Min(circleA.RBCollider.Friction, circleB.RBCollider.Friction);
 
             // Calculate impulse scalar
             float impulseScalar = -(1 + restitution) * velocityAlongNormal;
             impulseScalar /= (1 / circleA.Mass + 1 / circleB.Mass);
 
-            // Apply impulse
-            Vector2f impulse = impulseScalar * collisionNormal;
+            // Calculate and apply final impulses
+            Vector2f normalImpulse = impulseScalar * collisionNormal;  
+            Vector2f frictionImpulse = relativeTangentialVelocity * friction;
+            circleA.ApplyImpulse(normalImpulse + frictionImpulse);
+            circleB.ApplyImpulse(-(normalImpulse + frictionImpulse));
 
-            Console.WriteLine("A's Velocity before: " + circleA.Velocity + " B's Velocity before: " + circleB.Velocity);
-            circleA.ApplyImpulse(impulse);
-            circleB.ApplyImpulse(-impulse);
-            Console.WriteLine("A's Velocity after: " + circleA.Velocity + " B's Velocity after: " + circleB.Velocity);
-            Console.WriteLine("Velocity added to A: " + impulse / circleA.Mass + " Velocity added to B: " + impulse / circleB.Mass);
-
-            // // Angular velocity adjustments
-            Vector2f contactPointA = circleA.Position + collisionNormal * circleA.Radius;
-            Vector2f contactPointB = circleB.Position - collisionNormal * circleB.Radius;
-
+            // Apply frictional torque
             float inertiaA = circleA.Mass * circleA.Radius * circleA.Radius / 2;
             float inertiaB = circleB.Mass * circleB.Radius * circleB.Radius / 2;
-
-            float angularImpulseA = (contactPointA - circleA.Position).Cross(impulse) / inertiaA;
-            float angularImpulseB = (contactPointB - circleB.Position).Cross(impulse) / inertiaB;
-
-            circleA.AngularVelocity -= angularImpulseA;
-            circleB.AngularVelocity += angularImpulseB;
+            float frictionTorqueA = frictionImpulse.Length() * circleA.Radius / inertiaA;
+            float frictionTorqueB = frictionImpulse.Length() * circleB.Radius / inertiaB;
+            circleA.AngularVelocity -= frictionTorqueA;
+            circleB.AngularVelocity += frictionTorqueB;
         }
 
     }

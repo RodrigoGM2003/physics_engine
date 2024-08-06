@@ -116,6 +116,13 @@ namespace PhysicsEngine
             // RenderWindowManager.Window.Draw(circle);
         }
 
+        public void UpdatePosition(Vector2f position)
+        {
+            Position = position;
+            RBCollider.UpdatePosition(position, Rotation);
+            RBCollider.UpdateSweptAABB();
+        }
+
         /**
         * Apply a force to the RigidBody
         * @param force The force to apply to the object
