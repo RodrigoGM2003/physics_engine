@@ -52,8 +52,8 @@ namespace PhysicsEngine
                 return;
 
             // Calculate restitution
-            float restitution = MathF.Min(circleA.RBCollider.Elasticity, circleB.RBCollider.Elasticity);
-            float friction = MathF.Min(circleA.RBCollider.Friction, circleB.RBCollider.Friction);
+            float restitution = MathF.Min(circleA.Collider.Elasticity, circleB.Collider.Elasticity);
+            float friction = MathF.Min(circleA.Collider.Friction, circleB.Collider.Friction);
 
             // Calculate impulse scalar
             float impulseScalar = -(1 + restitution) * velocityAlongNormal;

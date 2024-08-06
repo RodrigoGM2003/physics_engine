@@ -15,7 +15,7 @@ namespace PhysicsEngine
          * Constructor for the CollisionManager class
          * @param bodies The bodies in the scene
          */
-        public CollisionManager(RigidBody[] bodies, bool discrete)
+        public CollisionManager(Body[] bodies, bool discrete)
         {
             Discrete = discrete;
             root = BuildBVH(bodies, 0);
@@ -26,7 +26,7 @@ namespace PhysicsEngine
          * @param bodies The bodies in the scene
          * @param depth The depth of the node in the hierarchy
          */
-        private BVHNode BuildBVH(RigidBody[] bodies, int depth)
+        private BVHNode BuildBVH(Body[] bodies, int depth)
         {
 
             // If there is only one body, return a node with that body
@@ -56,7 +56,7 @@ namespace PhysicsEngine
          * Update the bounding volume hierarchy
          * @param bodies The bodies in the scene
          */
-        public void UpdateBVH(RigidBody[] bodies)
+        public void UpdateBVH(Body[] bodies)
         {
             root = BuildBVH(bodies, 0);
         }
@@ -64,9 +64,9 @@ namespace PhysicsEngine
         /**
          * Get the potential collisions in the scene
          */
-        public List<(RigidBody, RigidBody)> GetPotentialCollisions()
+        public List<(Body, Body)> GetPotentialCollisions()
         {
-            var potentialCollisions = new List<(RigidBody, RigidBody)>();
+            var potentialCollisions = new List<(Body, Body)>();
             TraverseBVH(root, potentialCollisions);
             return potentialCollisions;
         }
@@ -79,7 +79,7 @@ namespace PhysicsEngine
          *
          * Here is where all the magic happens. We traverse the BVH and check for potential collisions between the bodies.
          */
-        private void TraverseBVH(BVHNode node, List<(RigidBody, RigidBody)> potentialCollisions)
+        private void TraverseBVH(BVHNode node, List<(Body, Body)> potentialCollisions)
         {
             // If the node is a leaf, return
             if (node.IsLeaf)
@@ -100,14 +100,14 @@ namespace PhysicsEngine
          * @param rightNode The right node
          * @param potentialCollisions The list of potential collisions
          */
-        private void CheckPotentialCollisions(BVHNode leftNode, BVHNode rightNode, List<(RigidBody, RigidBody)> potentialCollisions)
+        private void CheckPotentialCollisions(BVHNode leftNode, BVHNode rightNode, List<(Body, Body)> potentialCollisions)
         {
             // If the bounding boxes of the nodes intersect, check for potential collisions
             if (leftNode.BoundingBox.Intersects(rightNode.BoundingBox))
             {
                 // If both nodes are leaves, add them to the potential collisions list
                 if (leftNode.IsLeaf && rightNode.IsLeaf)
-                    potentialCollisions.Add((leftNode.rigidBody, rightNode.rigidBody));
+                    potentialCollisions.Add((leftNode.body, rightNode.body));
                 
                 // If one of the nodes is a leaf, check for potential collisions between the leaf and the subtrees of the other node
                 else if (leftNode.IsLeaf)

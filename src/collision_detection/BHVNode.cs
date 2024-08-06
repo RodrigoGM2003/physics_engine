@@ -11,23 +11,23 @@ namespace PhysicsEngine
      */
     public class BVHNode
     {
-        public RigidBody? rigidBody { get;} // The rigidBody in the node (if any)
+        public Body? body { get;} // The body in the node (if any)
         public BVHNode? Left { get;} // The left child of the node
         public BVHNode? Right { get;} // The right child of the node
         public FloatRect BoundingBox { get;} // The bounding box of the node
 
-        public bool IsLeaf => rigidBody != null;
+        public bool IsLeaf => body != null;
 
-        public BVHNode(RigidBody rigidBody, bool discrete)
+        public BVHNode(Body body, bool discrete)
         {
-            this.rigidBody = rigidBody;
+            this.body = body;
 
-            BoundingBox = discrete ? rigidBody.RBCollider.BoundingBox : rigidBody.RBCollider.SweptAABB;
+            BoundingBox = discrete ? body.Collider.BoundingBox : body.Collider.SweptAABB;
         }
 
         public BVHNode(BVHNode left, BVHNode right)
         {
-            rigidBody = null;
+            body = null;
             Left = left;
             Right = right;
 

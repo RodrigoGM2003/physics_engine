@@ -11,10 +11,8 @@ namespace PhysicsEngine
      */
     public class StaticBody : Body
     {
-        public Collider SBCollider { get; protected set; } // Collider for the object
         public Drawer? SBDrawer { get; protected set; } // Drawer for the object
-        public Vector2f Acceleration { get; set; } // Acceleration in m/s^2
-        public Vector2f Velocity { get; set; } // Velocity in m/s
+
 
         /**
         * Constructor for the StaticBody class
@@ -22,12 +20,10 @@ namespace PhysicsEngine
         * @param drawer The drawer for the body
         */
         public StaticBody(in Collider collider, in Drawer? drawer = null, Vector2f? velocity = null, Vector2f? acceleration = null)
+        :base(collider)
         {
             Position = new Vector2f(0, 0);
-            SBCollider = collider;
             SBDrawer = drawer;
-            Velocity = velocity ?? new Vector2f(0, 0);
-            Acceleration = acceleration ?? new Vector2f(0, 0);
         }
 
         /** 
@@ -37,6 +33,8 @@ namespace PhysicsEngine
         public override void Start(Vector2f position)
         {
             Position = position;
+            Collider.UpdatePosition(Position, Rotation);
+            Collider.UpdateSweptAABB();
         }
 
 
@@ -45,13 +43,7 @@ namespace PhysicsEngine
         * @param dt The change in time since the last frame
         */
         public override void Update(in float deltaTime)
-        {
-            Velocity += Acceleration * deltaTime;
-            Position += Velocity * deltaTime;
-            Acceleration = new Vector2f(0, 0);
-
-            SBCollider.UpdatePosition(Position, 0);
-        }
+        {}
 
         /**
         * Draw the StaticBody to the screen

@@ -11,7 +11,7 @@ namespace PhysicsEngine
      */
     public class RigidBody : Body
     {
-        public Collider RBCollider { get; protected set; }
+        // public new Collider Collider { get; protected set; }
         public Drawer RBDrawer { get; protected set; }
         public Vector2f Velocity { get; set; } // Velocity in m/s
         public Vector2f Acceleration { get; set; } // Acceleration in m/s^2
@@ -32,10 +32,11 @@ namespace PhysicsEngine
         */
         public RigidBody(in Collider collider, in Drawer drawer, float? rotation = 0, Vector2f? velocity = null, 
                         Vector2f? acceleration = null, float? mass = null, float? angularVelocity = null)
+        :base(collider)
         {
             Position = new Vector2f(0, 0);
             Rotation = rotation ?? 0;
-            RBCollider = collider;
+            Collider = collider;
             RBDrawer = drawer;
             Velocity = velocity ?? new Vector2f(0, 0);
             Acceleration = acceleration ?? new Vector2f(0, 0);
@@ -50,8 +51,8 @@ namespace PhysicsEngine
         public override void Start(Vector2f position)
         {
             Position = position;
-            RBCollider.UpdatePosition(Position, Rotation);
-            RBCollider.UpdateSweptAABB();
+            Collider.UpdatePosition(Position, Rotation);
+            Collider.UpdateSweptAABB();
         }
 
         /**
@@ -76,8 +77,8 @@ namespace PhysicsEngine
                 ApplyAcceleration(PhysicsConstants.GravityVector);
             
             //Update the colliders position
-            RBCollider.UpdatePosition(Position, Rotation);
-            RBCollider.UpdateSweptAABB();
+            Collider.UpdatePosition(Position, Rotation);
+            Collider.UpdateSweptAABB();
         }
 
         /**
@@ -90,26 +91,26 @@ namespace PhysicsEngine
         {   
             RBDrawer.Draw(Position, Rotation);
 
-            RectangleShape shape = new RectangleShape(RBCollider.SweptAABB.Size * PhysicsConstants.PixelsPerMeter);
-            shape.Position = new Vector2f(RBCollider.SweptAABB.Left * PhysicsConstants.PixelsPerMeter, RBCollider.SweptAABB.Top * PhysicsConstants.PixelsPerMeter);
+            RectangleShape shape = new RectangleShape(Collider.SweptAABB.Size * PhysicsConstants.PixelsPerMeter);
+            shape.Position = new Vector2f(Collider.SweptAABB.Left * PhysicsConstants.PixelsPerMeter, Collider.SweptAABB.Top * PhysicsConstants.PixelsPerMeter);
             shape.FillColor = Color.Transparent;
             shape.OutlineColor = Color.Red;
             shape.OutlineThickness = 1;
 
             RenderWindowManager.Window.Draw(shape);
 
-            CircleShape circle = new CircleShape(RBCollider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, 30);
-            circle.Position = new Vector2f(RBCollider.LastPosition.X * PhysicsConstants.PixelsPerMeter, RBCollider.LastPosition.Y * PhysicsConstants.PixelsPerMeter);
-            circle.Origin = new Vector2f(RBCollider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, RBCollider.BoundingBox.Height / 2 * PhysicsConstants.PixelsPerMeter);
+            CircleShape circle = new CircleShape(Collider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, 30);
+            circle.Position = new Vector2f(Collider.LastPosition.X * PhysicsConstants.PixelsPerMeter, Collider.LastPosition.Y * PhysicsConstants.PixelsPerMeter);
+            circle.Origin = new Vector2f(Collider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, Collider.BoundingBox.Height / 2 * PhysicsConstants.PixelsPerMeter);
             circle.FillColor = Color.Transparent;
             circle.OutlineColor = Color.Red;
             circle.OutlineThickness = 1;
 
             RenderWindowManager.Window.Draw(circle);
 
-            // circle = new CircleShape(RBCollider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, 30);
+            // circle = new CircleShape(Collider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, 30);
             // circle.Position = new Vector2f(Position.X * PhysicsConstants.PixelsPerMeter, Position.Y * PhysicsConstants.PixelsPerMeter);
-            // circle.Origin = new Vector2f(RBCollider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, RBCollider.BoundingBox.Height / 2 * PhysicsConstants.PixelsPerMeter);
+            // circle.Origin = new Vector2f(Collider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, Collider.BoundingBox.Height / 2 * PhysicsConstants.PixelsPerMeter);
             // circle.FillColor = Color.Blue;
             // circle.OutlineColor = Color.Blue;
             // circle.OutlineThickness = 1;   
@@ -119,8 +120,8 @@ namespace PhysicsEngine
         public void UpdatePosition(Vector2f position)
         {
             Position = position;
-            RBCollider.UpdatePosition(position, Rotation);
-            RBCollider.UpdateSweptAABB();
+            Collider.UpdatePosition(position, Rotation);
+            Collider.UpdateSweptAABB();
         }
 
         /**

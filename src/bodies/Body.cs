@@ -13,6 +13,12 @@ namespace PhysicsEngine
     {
         public Vector2f Position { get; protected set; } // Position in m
         public float Rotation { get; protected set; } // Rotation in grads
+        public Collider Collider { get; set; } // Collider for the object
+
+        public Body(Collider collider)
+        {
+            Collider = collider;  
+        }
 
 
         /**
