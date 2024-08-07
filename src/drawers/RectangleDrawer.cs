@@ -16,15 +16,17 @@ namespace PhysicsEngine
          * @param radius The radius of the circle
          * @param color The color of the shape
          */
-        public RectangleDrawer(in RenderWindow _window,  Vector2f size, Color? color = null)
+        public RectangleDrawer(in RenderWindow _window,  Vector2f size, Color? color = null, bool solid = true)
         : base(_window)
         {
             Size = size;
 
             shape = new RectangleShape(Size);
-            shape.FillColor = color ?? Color.White;
 
             shape.Origin = new Vector2f(Size.X / 2, Size.Y / 2); // Set origin to the center of the circle
+            shape.FillColor = color ?? Color.White;
+
+            SetSolid(solid);
         }
     }
 }

@@ -19,10 +19,11 @@ namespace PhysicsEngine
         * @param collider The collider for the body
         * @param drawer The drawer for the body
         */
-        public StaticBody(in Collider collider, in Drawer? drawer = null, Vector2f? velocity = null, Vector2f? acceleration = null)
+        public StaticBody(in Collider collider, in Drawer? drawer = null, float? rotation = 0)
         :base(collider)
         {
             Position = new Vector2f(0, 0);
+            Rotation = rotation ?? 0;
             SBDrawer = drawer;
         }
 
@@ -55,7 +56,7 @@ namespace PhysicsEngine
         {
             if (SBDrawer != null){
                 // Convert the floating-point position to pixel position            
-                SBDrawer.Draw(Position, 0);
+                SBDrawer.Draw(Position, Rotation);
             }
         }
     }

@@ -15,7 +15,7 @@ namespace PhysicsEngine
          * @param radius The radius of the circle
          * @param color The color of the shape
          */
-        public PolygonDrawer(in RenderWindow _window,  in Vector2f[] vertices, Color? color = null)
+        public PolygonDrawer(in RenderWindow _window,  in Vector2f[] vertices, Color? color = null, bool solid = true)
         : base(_window)
         {
             Vertices = vertices;
@@ -23,14 +23,15 @@ namespace PhysicsEngine
             ConvexShape polygon = new ConvexShape((uint)Vertices.Length);
             for (uint i = 0; i < Vertices.Length; i++)
                 polygon.SetPoint(i, Vertices[i]);
-            
-            polygon.FillColor = color ?? Color.White;
 
             shape = polygon;
 
             // Calculate the centroid and set it as the origin
             Vector2f centroid = CalculateCentroid(Vertices);
             shape.Origin = centroid;
+            shape.FillColor = color ?? Color.White;
+
+            SetSolid(solid);
         }
 
                 /**

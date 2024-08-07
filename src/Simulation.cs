@@ -20,7 +20,7 @@ namespace PhysicsEngine
         private static float accumulatedTime = 0.0f; // The time that has accumulated since the last frame
         private static CollisionManager collisionManager;
         private static CollisionResolver collisionResolver;
-        private static float speedFactor = 1f; // The speed factor of the simulation
+        private static float speedFactor = .2f; // The speed factor of the simulation
 
 
         /**
@@ -37,7 +37,7 @@ namespace PhysicsEngine
 
 
             // Create the bodies
-            Body[] Bodies = new Body[6];
+            Body[] Bodies = new Body[7];
             
             // Bodies[0] = new CircleRigidBody(
             //     radius: 1f, 
@@ -117,30 +117,29 @@ namespace PhysicsEngine
                 friction: 0.1f
             );
 
-            Collider collider1 = new PolygonCollider(
-                position: new Vector2f(0, 0), 
+            Bodies[5] = new PolygonStaticBody(
                 vertices: new Vector2f[] {
                     new Vector2f(0, 0),
-                    new Vector2f(8, 0),
-                    new Vector2f(8, 8),
+                    new Vector2f(100, 0),
+                    new Vector2f(100, 8),
                     new Vector2f(0, 8)
                 }, 
-                elasticity: 1, 
-                friction: 0.5f, 
+                window: window,
+                color: Color.Red,
+                elasticity: 1,
+                friction: 0.5f,
                 rotation: 0
             );
-            Drawer drawer1 = new PolygonDrawer(
-                _window: window, 
-                vertices: new Vector2f[] {
-                    new Vector2f(0, 0),
-                    new Vector2f(80, 0),
-                    new Vector2f(80, 80),
-                    new Vector2f(0, 80)
-                }, 
-                color: Color.Red
-            );
 
-            Bodies[5] = new StaticBody( collider: collider1, drawer: drawer1);
+            Bodies[6] = new CircleStaticBody(
+                radius: 4f,
+                window: window,
+                color: Color.Yellow,
+                elasticity: 1,
+                friction: 0.5f,
+                rotation: 0,
+                solid: false
+            );
     // (in Collider collider, in Drawer? drawer = null, Vector2f? velocity = null, Vector2f? acceleration = null)
 
 
@@ -235,7 +234,8 @@ namespace PhysicsEngine
             Bodies[2].Start(new Vector2f(10f, 60f));
             Bodies[3].Start(new Vector2f(30f, 10f));
             Bodies[4].Start(new Vector2f(0f, 30f));
-            Bodies[5].Start(new Vector2f(40f, 30f));
+            Bodies[5].Start(new Vector2f(50f, 75f));
+            Bodies[6].Start(new Vector2f(50f, 10f));
         }
 
         /**

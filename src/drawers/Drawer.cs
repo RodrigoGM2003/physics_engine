@@ -10,7 +10,6 @@ namespace PhysicsEngine
     {
         public RenderWindow window = null!; // The window to draw to
         public Shape shape {get; protected set;} = null!; // The shape of the object
-
         /**
         * Constructor for the Drawer class
         * @param window The window to draw to
@@ -21,6 +20,22 @@ namespace PhysicsEngine
         }
 
         /**
+        * Set whether the object is solid or not
+        * @param solid Whether the object is solid or not
+        */
+        public void SetSolid(bool solid){
+
+            Color color = shape.FillColor;
+            if(solid == true)
+                shape.FillColor = color;
+            else{
+                shape.FillColor = Color.Transparent;
+                shape.OutlineThickness = 1;
+                shape.OutlineColor = color;
+            }
+        }
+
+        /**
         * Draw the object to the screen
         * @param position The position of the object in the scene
         * @param rotation The rotation of the object in the scene
@@ -28,7 +43,8 @@ namespace PhysicsEngine
         public void Draw(Vector2f position, float rotation)
         { 
             //Change the position from meters to pixels
-            Vector2f drawPosition = new Vector2f(position.X * PhysicsConstants.PixelsPerMeter, position.Y * PhysicsConstants.PixelsPerMeter);
+            Vector2f drawPosition = new Vector2f(position.X * PhysicsConstants.PixelsPerMeter, 
+                                                position.Y * PhysicsConstants.PixelsPerMeter);
             shape.Position = drawPosition;
 
             //Change the rotation from radians to degrees

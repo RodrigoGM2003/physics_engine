@@ -36,7 +36,6 @@ namespace PhysicsEngine
         {
             Position = new Vector2f(0, 0);
             Rotation = rotation ?? 0;
-            Collider = collider;
             RBDrawer = drawer;
             Velocity = velocity ?? new Vector2f(0, 0);
             Acceleration = acceleration ?? new Vector2f(0, 0);

@@ -26,8 +26,10 @@ namespace PhysicsEngine
         * @param acceleration The acceleration of the polygon in m/s^2
         * @param angularVelocity The angular velocity of the polygon in rads/s
         */
-        public PolygonRigidBody(in Vector2f[] vertices, in RenderWindow window, float? rotation = 0, Color? color = null, float? elasticity = null, float? friction = null,
-                                float? mass = null, Vector2f? velocity = null, Vector2f? acceleration = null, float? angularVelocity = null)
+        public PolygonRigidBody(in Vector2f[] vertices, in RenderWindow window, float? rotation = 0, 
+                                Color? color = null, float? elasticity = null, float? friction = null,
+                                float? mass = null, Vector2f? velocity = null, Vector2f? acceleration = null, 
+                                float? angularVelocity = null, bool solid = true)
         : base(
             new PolygonCollider(
                 position: new Vector2f(0, 0), 
@@ -38,8 +40,9 @@ namespace PhysicsEngine
             ), 
             new PolygonDrawer(
                 _window: window, 
-                vertices: ScaleVertices(vertices, PhysicsConstants.PixelsPerMeter), 
-                color: color
+                vertices: Utils.ScaleVertices(vertices, PhysicsConstants.PixelsPerMeter), 
+                color: color,
+                solid: solid
             ), 
             mass: mass, 
             velocity: velocity, 
@@ -49,16 +52,6 @@ namespace PhysicsEngine
         )
         {
             Vertices = vertices;
-        }
-
-        private static Vector2f[] ScaleVertices(Vector2f[] vertices, float scale)
-        {
-            Vector2f[] scaledVertices = new Vector2f[vertices.Length];
-            for (int i = 0; i < vertices.Length; i++)
-            {
-                scaledVertices[i] = vertices[i] * scale;
-            }
-            return scaledVertices;
         }
     }
 }
