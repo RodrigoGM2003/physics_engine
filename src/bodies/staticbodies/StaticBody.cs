@@ -44,7 +44,11 @@ namespace PhysicsEngine
         * @param dt The change in time since the last frame
         */
         public override void Update(in float deltaTime)
-        {}
+        {
+            //Update the colliders position
+            Collider.UpdatePosition(Position, Rotation);
+            Collider.UpdateSweptAABB();
+        }
 
         /**
         * Draw the StaticBody to the screen

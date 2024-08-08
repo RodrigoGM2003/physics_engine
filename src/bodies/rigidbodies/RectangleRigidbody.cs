@@ -35,9 +35,10 @@ namespace PhysicsEngine
                 position: new Vector2f(0, 0), 
                 vertices: new Vector2f[] {
                     new Vector2f(-size.X / 2, -size.Y / 2),
-                    new Vector2f(size.X / 2, -size.Y / 2),
+                    new Vector2f(-size.X / 2, size.Y / 2),
                     new Vector2f(size.X / 2, size.Y / 2),
-                    new Vector2f(-size.X / 2, size.Y / 2)
+                    new Vector2f(size.X / 2, -size.Y / 2),
+                    
                 }, 
                 elasticity: elasticity, 
                 friction: friction, 

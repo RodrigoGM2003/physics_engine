@@ -48,5 +48,16 @@ namespace PhysicsEngine
         {
             return (float)Math.Sqrt(v.X * v.X + v.Y * v.Y);
         }
+
+        /**
+        * Method to calculate the squared length of a vector
+        * @param v The vector
+        * @return The squared length of the vector
+        */
+        
+        public static float LengthSquared(this Vector2f v)
+        {
+            return v.X * v.X + v.Y * v.Y;
+        }
     }
 }

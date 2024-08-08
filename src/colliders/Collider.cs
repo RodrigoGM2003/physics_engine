@@ -99,5 +99,26 @@ namespace PhysicsEngine
             //If there is no collision, return infinity
             return float.MaxValue;
         }
+
+        /**
+        * Check for real collision between two colliders
+        * @param other The other collider
+        */
+        public bool Intersects(in Collider other){
+            if (other == null)
+                throw new ArgumentNullException(nameof(other));
+
+            if (other is CircleCollider)
+                return Intersects(other as CircleCollider);
+            else if (other is PolygonCollider)
+                return Intersects(other as PolygonCollider);
+            else
+                throw new NotImplementedException();
+        }
+        public abstract bool Intersects(in CircleCollider other);
+        public abstract bool Intersects(in PolygonCollider other);
+
+
+
     }
 }

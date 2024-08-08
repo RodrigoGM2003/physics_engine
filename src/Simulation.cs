@@ -20,7 +20,7 @@ namespace PhysicsEngine
         private static float accumulatedTime = 0.0f; // The time that has accumulated since the last frame
         private static CollisionManager collisionManager;
         private static CollisionResolver collisionResolver;
-        private static float speedFactor = .2f; // The speed factor of the simulation
+        private static float speedFactor = .1f; // The speed factor of the simulation
 
 
         /**
@@ -68,8 +68,8 @@ namespace PhysicsEngine
                 mass: 1f, 
                 velocity: new Vector2f(10, -20),
                 angularVelocity: 10f,
-                elasticity: 1f,
-                friction: .1f
+                elasticity: .9f,
+                friction: .9f
             );
 
             Bodies[1] = new CircleRigidBody(
@@ -78,25 +78,46 @@ namespace PhysicsEngine
                 color: Color.Green, 
                 mass: 1f, 
                 velocity: new Vector2f(-10, -20),
-                angularVelocity: -5f,
-                elasticity: 1f,
-                friction: 0.5f
+                angularVelocity: 0f,
+                elasticity: .9f,
+                friction: 0.9f
             );
 
 
-            Bodies[2] = new CircleRigidBody(
-                radius: 2f, 
+            // Bodies[2] = new CircleRigidBody(
+            //     radius: 2f, 
+            //     window: window, 
+            //     color: Color.Magenta,                             
+            //     mass: 1, 
+            //     velocity: new Vector2f(10, -30),
+            //     angularVelocity: 5f,
+            //     elasticity: 1f,
+            //     friction: 0.5f
+            // );
+            Bodies[2] = new RectangleRigidBody(
+                size: new Vector2f(10, 2),
                 window: window, 
                 color: Color.Magenta,                             
                 mass: 1, 
                 velocity: new Vector2f(10, -30),
-                angularVelocity: 5f,
+                angularVelocity: 0f,
                 elasticity: 1f,
-                friction: 0.5f
+                friction: 0.5f,
+                rotation: MathF.PI / 2
             );
 
-            Bodies[3] = new CircleRigidBody(
-                radius: 3f, 
+            // Bodies[3] = new CircleRigidBody(
+            //     radius: 3f, 
+            //     window: window, 
+            //     color: Color.Cyan, 
+            //     mass: 1, 
+            //     velocity: new Vector2f(0, 0),
+            //     angularVelocity: 0f,
+            //     elasticity: 1f,
+            //     friction: 0.5f
+            // );
+            Bodies[3] = new RectangleRigidBody(
+                size: new Vector2f(3, 3),
                 window: window, 
                 color: Color.Cyan, 
                 mass: 1, 
@@ -117,13 +138,21 @@ namespace PhysicsEngine
                 friction: 0.1f
             );
 
-            Bodies[5] = new PolygonStaticBody(
-                vertices: new Vector2f[] {
-                    new Vector2f(0, 0),
-                    new Vector2f(100, 0),
-                    new Vector2f(100, 8),
-                    new Vector2f(0, 8)
-                }, 
+            // Bodies[5] = new PolygonStaticBody(
+            //     vertices: new Vector2f[] {
+            //         new Vector2f(0, 0),
+            //         new Vector2f(100, 0),
+            //         new Vector2f(100, 8),
+            //         new Vector2f(0, 8)
+            //     },
+            //     window: window,
+            //     color: Color.Red,
+            //     elasticity: 1,
+            //     friction: 0.5f,
+            //     rotation: 0
+            // );
+            Bodies[5] = new RectangleStaticBody(
+                size: new Vector2f(30, 30),
                 window: window,
                 color: Color.Red,
                 elasticity: 1,
@@ -231,10 +260,11 @@ namespace PhysicsEngine
             // Bodies[1].Start(new Vector2f(40f, 60f));
             Bodies[0].Start(new Vector2f(0, 60f));
             Bodies[1].Start(new Vector2f(30f, 60f));
-            Bodies[2].Start(new Vector2f(10f, 60f));
+            Bodies[2].Start(new Vector2f(20f, 70f));
             Bodies[3].Start(new Vector2f(30f, 10f));
             Bodies[4].Start(new Vector2f(0f, 30f));
-            Bodies[5].Start(new Vector2f(50f, 75f));
+            Bodies[5].Start(new Vector2f(50f, 50f));
+            // Bodies[5].Start(new Vector2f(50f, 75f));
             Bodies[6].Start(new Vector2f(50f, 10f));
         }
 
@@ -251,9 +281,16 @@ namespace PhysicsEngine
 
             var potentialCollisions = collisionManager.GetPotentialCollisions();
 
-            foreach (var (bodyA, bodyB) in potentialCollisions)
+            foreach (var (bodyA, bodyB) in potentialCollisions){
+                if (bodyA.Collider.Intersects(bodyB.Collider))
+                    Console.WriteLine("Collision detected" + bodyA + " " + bodyB);
+                else
+                    Console.WriteLine("No collision detected" + bodyA + " " + bodyB);
+
+                    // colliderResolver.ResolveCollision(bodyA, bodyB);
                 if (bodyA is CircleRigidBody circleA && bodyB is CircleRigidBody circleB)
                     collisionResolver.ResolveCollision(circleA, circleB);
+            }
         }
 
         /**

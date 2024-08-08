@@ -3,6 +3,7 @@ using SFML.Graphics;
 using SFML.Window;
 using SFML.System;
 using System.Data;
+using System.Numerics;
 
 
 namespace PhysicsEngine
@@ -47,6 +48,19 @@ namespace PhysicsEngine
             Rotation = rotation;         
 
             BoundingBox = new FloatRect(Position.X - Radius, Position.Y - Radius, 2 * Radius, 2 * Radius);        
+        }
+
+
+        public override bool Intersects(in CircleCollider other)
+        {
+            Vector2f collisionNormal = Position - other.Position;
+            float distance = collisionNormal.Length();
+
+            return distance <= Radius + other.Radius;
+        }
+        public override bool Intersects(in PolygonCollider other)
+        {
+            return other.Intersects(this);
         }
     }
 }

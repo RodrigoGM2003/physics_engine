@@ -32,8 +32,8 @@ namespace PhysicsEngine
                                 float? angularVelocity = null, bool solid = true)
         : base(
             new PolygonCollider(
-                position: new Vector2f(0, 0), 
-                vertices: vertices, 
+                position: new Vector2f(0, 0),
+                vertices: Utils.FixVertices(vertices), 
                 elasticity: elasticity, 
                 friction: friction, 
                 rotation: rotation
