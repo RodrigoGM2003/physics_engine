@@ -96,22 +96,31 @@ namespace PhysicsEngine
 
         public override bool Intersects(in CircleCollider other)
         {
-            IEnumerable<Vector2f> myAxes = GetAxes(Vertices.Select(v => v + this.Position).ToArray());
-            IEnumerable<Vector2f> otherAxes = GetAxes(new Vector2f[]{ GetClosestVertex(other.Position, Vertices)});
+            // Calculate the true vertices of the polygon
+            Vector2f[] thisTrueVertices = CalculateTrueVertices(Vertices, Rotation, Position);
 
+            // Calculate the axes of the two polygons
+            IEnumerable<Vector2f> myAxes = GetAxes(thisTrueVertices);
+            IEnumerable<Vector2f> otherAxes = GetAxes(new Vector2f[]{ GetClosestVertex(other.Position, thisTrueVertices), other.Position });
+
+            // Iteate over all axes projecting the vertices of both polygons
             foreach (Vector2f axis in myAxes.Concat(otherAxes)){
-                (float minA, float maxA) = Project(Vertices, axis);
+                (float minA, float maxA) = Project(thisTrueVertices, axis);
                 (float minB, float maxB) = Project(new Vector2f[] { other.Position }, axis);
 
+                //The projection of the circle is a single point, so we need to expand it to both sides
                 minB -= other.Radius;
                 maxB += other.Radius;
 
+                //Check if the projections overlap if they don't return false
                 if (maxA < minB || maxB < minA)
                     return false;
                 
             }
+            //If all axes overlap, return true
             return true;
         }
+        
         /**
         * Check if the polygon intersects with another polygon
         * @param other The other polygon
@@ -121,72 +130,52 @@ namespace PhysicsEngine
         */
         public override bool Intersects(in PolygonCollider other)
         {
-            Vector2f[] thisTrueVertices = new Vector2f[Vertices.Length];
-            Vector2f[] otherTrueVertices = new Vector2f[other.Vertices.Length];
+            // Calculate the true vertices of the polygons
+            Vector2f[] thisTrueVertices = CalculateTrueVertices(Vertices, Rotation, Position);
+            Vector2f[] otherTrueVertices = CalculateTrueVertices(other.Vertices, other.Rotation, other.Position);
 
-            //Apply the current position and rotation to the vertices
-            float cos = (float)Math.Cos(Rotation);
-            float sin = (float)Math.Sin(Rotation);
-
-            for (int i = 0; i < Vertices.Length; i++)
-            {
-                float x = Vertices[i].X;
-                float y = Vertices[i].Y;
-
-                // Apply the 2D rotation matrix
-                thisTrueVertices[i] = new Vector2f(
-                    x * cos - y * sin + Position.X,  // new x-coordinate
-                    x * sin + y * cos + Position.Y   // new y-coordinate
-                );
-            }
-
-            cos = (float)Math.Cos(other.Rotation);
-            sin = (float)Math.Sin(other.Rotation);
-
-            for (int i = 0; i < other.Vertices.Length; i++)
-            {
-                float x = other.Vertices[i].X;
-                float y = other.Vertices[i].Y;
-
-                // Apply the 2D rotation matrix
-                otherTrueVertices[i] = new Vector2f(
-                    x * cos - y * sin + other.Position.X,  // new x-coordinate
-                    x * sin + y * cos + other.Position.Y   // new y-coordinate
-                );
-            }
-            //Calculate the axes of the two polygons
-            // IEnumerable<Vector2f> myAxes = GetAxes(Vertices);
-            // IEnumerable<Vector2f> otherAxes = GetAxes(other.Vertices);
+            // Calculate the axes of the two polygons
             IEnumerable<Vector2f> myAxes = GetAxes(thisTrueVertices);
             IEnumerable<Vector2f> otherAxes = GetAxes(otherTrueVertices);
 
-            Console.WriteLine("A position: " + Position.X + " " + Position.Y);
-            Console.WriteLine("A true 1 vertex: + " + thisTrueVertices[0].X + " " + thisTrueVertices[0].Y);
-            Console.WriteLine("A true 2 vertex: + " + thisTrueVertices[1].X + " " + thisTrueVertices[1].Y);
-            Console.WriteLine("A true 3 vertex: + " + thisTrueVertices[2].X + " " + thisTrueVertices[2].Y);
-            Console.WriteLine("A true 4 vertex: + " + thisTrueVertices[3].X + " " + thisTrueVertices[3].Y);
-            Console.WriteLine("B position: " + other.Position.X + " " + other.Position.Y);
-            Console.WriteLine("B true 1 vertex: + " + otherTrueVertices[0].X + " " + otherTrueVertices[0].Y);
-            Console.WriteLine("B true 2 vertex: + " + otherTrueVertices[1].X + " " + otherTrueVertices[1].Y);
-            Console.WriteLine("B true 3 vertex: + " + otherTrueVertices[2].X + " " + otherTrueVertices[2].Y);
-            Console.WriteLine("B true 4 vertex: + " + otherTrueVertices[3].X + " " + otherTrueVertices[3].Y);
-
-
-            //Iteate over all axes projecting the vertices of both polygons
+            // Iteate over all axes projecting the vertices of both polygons
             foreach (Vector2f axis in myAxes.Concat(otherAxes)){
                 (float minA, float maxA) = Project(thisTrueVertices, axis);
                 (float minB, float maxB) = Project(otherTrueVertices, axis);
 
                 //Check if the projections overlap if they don't return false
-                if (minA > maxB || minB > maxA){
-                    Console.WriteLine("Polygon does not intersect with polygon " + minA + " " + maxA + " / " + minB + " " + maxB);
+                if (minA > maxB || minB > maxA)
                     return false;
-                }
             }
-
-            Console.WriteLine("Polygon intersects with polygon");
             //If all axes overlap, return true
             return true;
+        }
+
+        /**
+        * Calculate the true vertices of the polygon
+        * @param vertices The vertices of the polygon
+        * @return The true vertices of the polygon
+        */
+        private Vector2f[] CalculateTrueVertices(Vector2f[] vertices, float rotation, Vector2f position){
+            Vector2f[] trueVertices = new Vector2f[vertices.Length];
+
+            //Apply the current position and rotation to the vertices
+            float cos = (float)Math.Cos(rotation);
+            float sin = (float)Math.Sin(rotation);
+
+            for (int i = 0; i < vertices.Length; i++)
+            {
+                float x = vertices[i].X;
+                float y = vertices[i].Y;
+
+                // Apply the 2D rotation matrix
+                trueVertices[i] = new Vector2f(
+                    x * cos - y * sin + position.X,  // new x-coordinate
+                    x * sin + y * cos + position.Y   // new y-coordinate
+                );
+            }
+
+            return trueVertices;
         }
 
         /**

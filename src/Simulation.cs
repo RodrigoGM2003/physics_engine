@@ -103,7 +103,7 @@ namespace PhysicsEngine
                 angularVelocity: 0f,
                 elasticity: 1f,
                 friction: 0.5f,
-                rotation: MathF.PI / 2
+                rotation: 2//MathF.PI / 2
             );
 
             // Bodies[3] = new CircleRigidBody(
@@ -132,7 +132,7 @@ namespace PhysicsEngine
                 window: window, 
                 color: Color.Yellow, 
                 mass: 1, 
-                velocity: new Vector2f(20, -20),
+                velocity: new Vector2f(-20, -20),
                 angularVelocity: 1,
                 elasticity: 1f,
                 friction: 0.1f
@@ -260,7 +260,7 @@ namespace PhysicsEngine
             // Bodies[1].Start(new Vector2f(40f, 60f));
             Bodies[0].Start(new Vector2f(0, 60f));
             Bodies[1].Start(new Vector2f(30f, 60f));
-            Bodies[2].Start(new Vector2f(20f, 70f));
+            Bodies[2].Start(new Vector2f(20f, 65f));
             Bodies[3].Start(new Vector2f(30f, 10f));
             Bodies[4].Start(new Vector2f(0f, 30f));
             Bodies[5].Start(new Vector2f(50f, 50f));
