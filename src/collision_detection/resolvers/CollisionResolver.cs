@@ -14,10 +14,35 @@ namespace PhysicsEngine
         public abstract bool Discrete { get; } // Whether continuous collision detection is enabled
 
         /**
+        * Method to resolve a collision between two rigid bodies
+        * @param bodyA The first rigid body
+        * @param bodyB The second rigid body
+        */
+
+        public void ResolveCollision(Body bodyA, Body bodyB)
+        {
+            if (bodyA.Collider is CircleCollider && bodyB.Collider is CircleCollider)
+                ResolveCircleCollision(bodyA, bodyB);
+            
+            else if (bodyA.Collider is CircleCollider && bodyB.Collider is PolygonCollider)
+                ResolveMixedCollision(bodyA, bodyB);
+            
+            else if (bodyB.Collider is PolygonCollider && bodyA.Collider is CircleCollider)
+                ResolveMixedCollision(bodyB, bodyA);
+            
+            else if (bodyA.Collider is PolygonCollider && bodyB.Collider is PolygonCollider)
+                ResolvePolygonCollision(bodyA, bodyB);
+        }
+
+
+        /**
         * Method to resolve a collision between two circle rigid bodies
         * @param circleA The first circle rigid body
         * @param circleB The second circle rigid body
         */
-        public abstract void ResolveCollision(CircleRigidBody circleA, CircleRigidBody circleB);
+        protected abstract void ResolveCircleCollision(Body circleA, Body circleB);
+        protected abstract void ResolveMixedCollision(Body circle, Body polygon);
+        protected abstract void ResolvePolygonCollision(Body polygonA, Body polygonB);
+        
     }
 }

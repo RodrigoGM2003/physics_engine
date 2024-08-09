@@ -283,9 +283,7 @@ namespace PhysicsEngine
 
             foreach (var (bodyA, bodyB) in potentialCollisions){
                 if (bodyA.Collider.Intersects(bodyB.Collider))
-                    Console.WriteLine("Collision detected" + bodyA + " " + bodyB);
-                else
-                    Console.WriteLine("No collision detected" + bodyA + " " + bodyB);
+                    collisionResolver.ResolveCollision(bodyA, bodyB);
 
                     // colliderResolver.ResolveCollision(bodyA, bodyB);
                 if (bodyA is CircleRigidBody circleA && bodyB is CircleRigidBody circleB)

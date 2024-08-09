@@ -38,126 +38,30 @@ namespace PhysicsEngine
         * @param toi The time of impact
         * @param deltaTime The change in time since the last frame
         */
-        public override void ResolveCollision(CircleRigidBody circleA, CircleRigidBody circleB)
+        protected override void ResolveCircleCollision(Body circleA, Body circleB)
         {
-            Vector2f collisionNormal = circleA.Position - circleB.Position;
-            float distance = collisionNormal.Length();
-            collisionNormal /= distance; // Normalize the vector
-
-            if (distance > circleA.Radius + circleB.Radius)
-                return;
-
-            // Eliminate overlap
-            float overlap = (circleA.Radius + circleB.Radius) - distance;
-            circleA.UpdatePosition(circleA.Position + (overlap / 2 * collisionNormal));
-            circleB.UpdatePosition(circleB.Position - (overlap / 2 * collisionNormal));
-
-            // Calculate relative velocity
-            Vector2f relativeVelocity = circleA.Velocity - circleB.Velocity;
-
-            // Calculate relative velocity in terms of the normal direction
-            float velocityAlongNormal = relativeVelocity.Dot(collisionNormal);
-
-            // Do not resolve if velocities are separating
-            if (velocityAlongNormal > 0)
-                return;
-
-            // Calculate restitution
-            float restitution = MathF.Min(circleA.Collider.Elasticity, circleB.Collider.Elasticity);
-            float friction = MathF.Min(circleA.Collider.Friction, circleB.Collider.Friction);
-
-            // Calculate impulse scalar
-            float impulseScalar = -(1 + restitution) * velocityAlongNormal;
-            impulseScalar /= (1 / circleA.Mass + 1 / circleB.Mass);
-
-            // Calculate and apply normal impulse
-            Vector2f normalImpulse = impulseScalar * collisionNormal;
-            circleA.ApplyImpulse(normalImpulse);
-            circleB.ApplyImpulse(-normalImpulse);
-
-            // Calculate relative tangential velocity at the point of contact due to linear motion
-            Vector2f tangent = new Vector2f(-collisionNormal.Y, collisionNormal.X);
-            float tangentialVelocity = relativeVelocity.Dot(tangent);
-
-            // Calculate friction impulse
-            float frictionImpulseMagnitude = tangentialVelocity * friction / (1 / circleA.Mass + 1 / circleB.Mass);
-            Vector2f frictionImpulse = frictionImpulseMagnitude * tangent;
-            circleA.ApplyImpulse(-frictionImpulse);
-            circleB.ApplyImpulse(frictionImpulse);
-
-            // Apply frictional torque
-            float inertiaA = circleA.Mass * circleA.Radius * circleA.Radius / 2;
-            float inertiaB = circleB.Mass * circleB.Radius * circleB.Radius / 2;
-            float frictionTorqueA = frictionImpulse.Length() * circleA.Radius / inertiaA;
-            float frictionTorqueB = frictionImpulse.Length() * circleB.Radius / inertiaB;
-
-            Console.WriteLine("A's angular velocity: " + circleA.AngularVelocity);
-            Console.WriteLine("B's angular velocity: " + circleB.AngularVelocity);
-            circleA.AngularVelocity -= frictionTorqueA;
-            circleB.AngularVelocity += frictionTorqueB;
-            Console.WriteLine("A's angular velocity: " + circleA.AngularVelocity);
-            Console.WriteLine("B's angular velocity: " + circleB.AngularVelocity);
+            Console.WriteLine("Circle collision");
         }
-        // public override void ResolveCollision(CircleRigidBody circleA, CircleRigidBody circleB)
-        // {
-        //     Vector2f collisionNormal = circleA.Position - circleB.Position;
-        //     float distance = collisionNormal.Length();
-        //     collisionNormal /= distance; // Normalize the vector
 
-        //     if (distance > circleA.Radius + circleB.Radius)
-        //         return;
+        /**
+        * Method to resolve a collision between a circle and a polygon rigid body
+        * @param circle The circle rigid body
+        * @param polygon The polygon rigid body
+        */
+        protected override void ResolveMixedCollision(Body circle, Body polygon)
+        {
+            Console.WriteLine("Mixed collision");
+        }
 
-        //     // Eliminate overlap
-        //     float overlap = (circleA.Radius + circleB.Radius) - distance;
-        //     circleA.UpdatePosition(circleA.Position + ( overlap / 2 * collisionNormal));
-        //     circleB.UpdatePosition(circleB.Position - ( overlap / 2 * collisionNormal));
-
-        //     // Calculate relative velocity
-        //     Vector2f relativeVelocity = circleA.Velocity - circleB.Velocity;
-
-        //     // Calculate relative tangential velocity
-        //     Vector2f tangentialVelocityA = new Vector2f(circleA.AngularVelocity * circleA.Radius * collisionNormal.Y, 
-        //                                                 -circleA.AngularVelocity * circleA.Radius * collisionNormal.X);
-        //     Vector2f tangentialVelocityB = new Vector2f(-circleB.AngularVelocity * circleB.Radius * collisionNormal.Y, 
-        //                                                 circleB.AngularVelocity * circleB.Radius * collisionNormal.X);
-        //     Vector2f relativeTangentialVelocity = tangentialVelocityA - tangentialVelocityB;
-
-
-        //     // Calculate relative velocity in terms of the normal direction
-        //     float velocityAlongNormal = relativeVelocity.Dot(collisionNormal);
-
-        //     // Do not resolve if velocities are separating
-        //     if (velocityAlongNormal > 0)
-        //         return;
-
-        //     // Calculate restitution
-        //     float restitution = MathF.Min(circleA.Collider.Elasticity, circleB.Collider.Elasticity);
-        //     float friction = MathF.Min(circleA.Collider.Friction, circleB.Collider.Friction);
-
-        //     // Calculate impulse scalar
-        //     float impulseScalar = -(1 + restitution) * velocityAlongNormal;
-        //     impulseScalar /= (1 / circleA.Mass + 1 / circleB.Mass);
-
-        //     // Calculate and apply final impulses
-        //     Vector2f normalImpulse = impulseScalar * collisionNormal;  
-        //     Vector2f frictionImpulse = relativeTangentialVelocity * friction;
-        //     Console.WriteLine("Normal impulse: " + normalImpulse);
-        //     Console.WriteLine("Friction impulse: " + frictionImpulse);
-        //     circleA.ApplyImpulse(normalImpulse + frictionImpulse);
-        //     circleB.ApplyImpulse(-(normalImpulse + frictionImpulse));
-
-        //     // Apply frictional torque
-        //     float inertiaA = circleA.Mass * circleA.Radius * circleA.Radius / 2;
-        //     float inertiaB = circleB.Mass * circleB.Radius * circleB.Radius / 2;
-        //     float frictionTorqueA = frictionImpulse.Length() * circleA.Radius / inertiaA;
-        //     float frictionTorqueB = frictionImpulse.Length() * circleB.Radius / inertiaB;
-        //     Console.WriteLine("A's angular velocity: " + circleA.AngularVelocity);
-        //     Console.WriteLine("B's angular velocity: " + circleB.AngularVelocity);
-        //     circleA.AngularVelocity -= frictionTorqueA;
-        //     circleB.AngularVelocity += frictionTorqueB;
-        //     Console.WriteLine("A's angular velocity: " + circleA.AngularVelocity);
-        //     Console.WriteLine("B's angular velocity: " + circleB.AngularVelocity);
-        // }
+        /**
+        * Method to resolve a collision between a 2 polygons
+        * @param polygonA The first polygon rigid body
+        * @param polygonB The second polygon rigid body
+        */
+        protected override void ResolvePolygonCollision(Body polygonA, Body polygonB)
+        {
+            Console.WriteLine("Polygon collision");
+        }
 
     }
 }
