@@ -104,19 +104,20 @@ namespace PhysicsEngine
         * Check for real collision between two colliders
         * @param other The other collider
         */
-        public bool Intersects(in Collider other){
+        public bool Intersects(in Collider other, out Vector2f normal, out float depth){
             if (other == null)
                 throw new ArgumentNullException(nameof(other));
 
-            if (other is CircleCollider)
-                return Intersects(other as CircleCollider);
+            if (other is CircleCollider){
+                return this.Intersects(other as CircleCollider, out normal, out depth);
+            }
             else if (other is PolygonCollider)
-                return Intersects(other as PolygonCollider);
+                return this.Intersects(other as PolygonCollider, out normal, out depth);
             else
                 throw new NotImplementedException();
         }
-        public abstract bool Intersects(in CircleCollider other);
-        public abstract bool Intersects(in PolygonCollider other);
+        public abstract bool Intersects(in CircleCollider other, out Vector2f normal, out float depth);
+        public abstract bool Intersects(in PolygonCollider other, out Vector2f normal, out float depth);
 
 
 

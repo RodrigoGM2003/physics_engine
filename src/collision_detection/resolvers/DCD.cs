@@ -38,8 +38,7 @@ namespace PhysicsEngine
         * @param toi The time of impact
         * @param deltaTime The change in time since the last frame
         */
-        protected override void ResolveCircleCollision(Body circleA, Body circleB)
-        {
+        protected override void ResolveCircleCollision(RigidBody circleA, RigidBody circleB, in Vector2f normal, in float depth){
             Console.WriteLine("Circle collision");
         }
 
@@ -48,7 +47,7 @@ namespace PhysicsEngine
         * @param circle The circle rigid body
         * @param polygon The polygon rigid body
         */
-        protected override void ResolveMixedCollision(Body circle, Body polygon)
+        protected override void ResolveMixedCollision(RigidBody circleA, RigidBody circleB, in Vector2f normal, in float depth)
         {
             Console.WriteLine("Mixed collision");
         }
@@ -58,7 +57,7 @@ namespace PhysicsEngine
         * @param polygonA The first polygon rigid body
         * @param polygonB The second polygon rigid body
         */
-        protected override void ResolvePolygonCollision(Body polygonA, Body polygonB)
+        protected override void ResolvePolygonCollision(RigidBody circleA, RigidBody circleB, in Vector2f normal, in float depth)
         {
             Console.WriteLine("Polygon collision");
         }

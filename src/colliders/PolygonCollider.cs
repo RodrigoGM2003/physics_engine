@@ -94,29 +94,53 @@ namespace PhysicsEngine
             BoundingBox = new FloatRect(Position.X - width / 2, Position.Y - height / 2, width, height);
         }
 
-        public override bool Intersects(in CircleCollider other)
+        /**
+        * Check if the polygon intersects with a circle
+        * @param other The circle collider
+        * @param normal The normal of the collision
+        * @param depth The depth of the collision
+        * @return True if the polygon intersects with the circle, false otherwise
+        */
+        public override bool Intersects(in CircleCollider other, out Vector2f normal, out float depth)
         {
+            normal = new Vector2f(0, 0);
+            depth = float.MaxValue;
             // Calculate the true vertices of the polygon
-            Vector2f[] thisTrueVertices = CalculateTrueVertices(Vertices, Rotation, Position);
+            Vector2f[] thisTrueVertices = CalculateTrueVertices(Vertices, Position, Rotation);
 
-            // Calculate the axes of the two polygons
+            // Calculate the axes 
             IEnumerable<Vector2f> myAxes = GetAxes(thisTrueVertices);
-            IEnumerable<Vector2f> otherAxes = GetAxes(new Vector2f[]{ GetClosestVertex(other.Position, thisTrueVertices), other.Position });
+
+            // Calculate the closest vertex of the polygon to the circle and the extra axis
+            Vector2f closestVertex = GetClosestVertex(other.Position, thisTrueVertices);
+            Vector2f extraAxis = closestVertex - other.Position;
+            float distance = extraAxis.Length();
+            extraAxis /= distance;
+
+            // Add the extra axis to the axes
+            myAxes = myAxes.Concat(new Vector2f[]{ extraAxis });
 
             // Iteate over all axes projecting the vertices of both polygons
-            foreach (Vector2f axis in myAxes.Concat(otherAxes)){
+            foreach (Vector2f axis in myAxes){
                 (float minA, float maxA) = Project(thisTrueVertices, axis);
-                (float minB, float maxB) = Project(new Vector2f[] { other.Position }, axis);
+                (float minB, float maxB) = Project(new Vector2f[]{ other.Position}, axis);
 
-                //The projection of the circle is a single point, so we need to expand it to both sides
+                // //The projection of the circle is a single point, so we need to expand it to both sides
                 minB -= other.Radius;
                 maxB += other.Radius;
 
                 //Check if the projections overlap if they don't return false
-                if (maxA < minB || maxB < minA)
+                if (minA >= maxB || minB >= maxA)
                     return false;
-                
+
+                //Calculate the depth of the intersection
+                float axisDepth = Math.Min(maxB - minA, maxA - minB);
+                if (axisDepth < depth){
+                    depth = axisDepth;
+                    normal = axis;
+                }
             }
+
             //If all axes overlap, return true
             return true;
         }
@@ -124,15 +148,19 @@ namespace PhysicsEngine
         /**
         * Check if the polygon intersects with another polygon
         * @param other The other polygon
+        * @param normal The normal of the collision
+        * @param depth The depth of the collision
         * @return True if the polygons intersect, false otherwise
         * @see https://www.sevenson.com.au/programming/sat/
         * Implementation of the Separating Axis Theorem (SAT)
         */
-        public override bool Intersects(in PolygonCollider other)
+        public override bool Intersects(in PolygonCollider other, out Vector2f normal, out float depth)
         {
+            normal = new Vector2f(0, 0);
+            depth = float.MaxValue;
             // Calculate the true vertices of the polygons
-            Vector2f[] thisTrueVertices = CalculateTrueVertices(Vertices, Rotation, Position);
-            Vector2f[] otherTrueVertices = CalculateTrueVertices(other.Vertices, other.Rotation, other.Position);
+            Vector2f[] thisTrueVertices = CalculateTrueVertices(Vertices, Position, Rotation);
+            Vector2f[] otherTrueVertices = CalculateTrueVertices(other.Vertices, other.Position, other.Rotation);
 
             // Calculate the axes of the two polygons
             IEnumerable<Vector2f> myAxes = GetAxes(thisTrueVertices);
@@ -144,8 +172,15 @@ namespace PhysicsEngine
                 (float minB, float maxB) = Project(otherTrueVertices, axis);
 
                 //Check if the projections overlap if they don't return false
-                if (minA > maxB || minB > maxA)
+                if (minA >= maxB || minB >= maxA)
                     return false;
+
+                //Calculate the depth of the intersection
+                float axisDepth = Math.Min(maxB - minA, maxA - minB);
+                if (axisDepth < depth){
+                    depth = axisDepth;
+                    normal = axis;
+                }
             }
             //If all axes overlap, return true
             return true;
@@ -156,7 +191,7 @@ namespace PhysicsEngine
         * @param vertices The vertices of the polygon
         * @return The true vertices of the polygon
         */
-        private Vector2f[] CalculateTrueVertices(Vector2f[] vertices, float rotation, Vector2f position){
+        public Vector2f[] CalculateTrueVertices(Vector2f[] vertices, Vector2f position, float rotation){
             Vector2f[] trueVertices = new Vector2f[vertices.Length];
 
             //Apply the current position and rotation to the vertices
@@ -188,19 +223,14 @@ namespace PhysicsEngine
 
             for (int i = 0; i < vertices.Length; i++)
             {
-                //Calculate the normal of the edge (normal = axis)
-                Vector2f p1 = vertices[i];
-                Vector2f p2 = vertices[(i + 1) % vertices.Length];
-
-                Vector2f edge = p2 - p1;
-                Vector2f normal = new Vector2f(-edge.Y, edge.X);
-                normal = normal / normal.Length();
-
-                axes[i] = normal;
+                Vector2f edge = vertices[(i + 1) % vertices.Length] - vertices[i];
+                axes[i] = new Vector2f(-edge.Y, edge.X);
+                axes[i] = axes[i] / axes[i].Length();
             }
 
             return axes;
         }
+
         /**
         * Project the vertices of the polygon onto the axis
         * @param vertices The vertices of the polygon
@@ -243,7 +273,7 @@ namespace PhysicsEngine
                     minDistance = distance;
                 }
             }
-
+            //Vertex and index of the closest vertex
             return closestVertex;
         }
     }

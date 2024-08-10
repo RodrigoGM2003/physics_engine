@@ -11,14 +11,14 @@ namespace PhysicsEngine
      */
     public class BVHNode
     {
-        public Body? body { get;} // The body in the node (if any)
+        public RigidBody? body { get;} // The body in the node (if any)
         public BVHNode? Left { get;} // The left child of the node
         public BVHNode? Right { get;} // The right child of the node
         public FloatRect BoundingBox { get;} // The bounding box of the node
 
         public bool IsLeaf => body != null;
 
-        public BVHNode(Body body, bool discrete)
+        public BVHNode(RigidBody body, bool discrete)
         {
             this.body = body;
 

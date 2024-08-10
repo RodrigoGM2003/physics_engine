@@ -19,15 +19,15 @@ namespace PhysicsEngine
         * @param toi The time of impact
         * @param deltaTime The change in time since the last frame
         */
-        protected override void ResolveCircleCollision(Body circleA, Body circleB)//, float toi, float deltaTime)
+        protected override void ResolveCircleCollision(RigidBody circleA, RigidBody circleB, in Vector2f normal, in float depth)
         {
 
         }
-        protected override void ResolveMixedCollision(Body circleA, Body circleB)//, float toi, float deltaTime)
+        protected override void ResolveMixedCollision(RigidBody circleA, RigidBody circleB, in Vector2f normal, in float depth)
         {
 
         }
-        protected override void ResolvePolygonCollision(Body circleA, Body circleB)//, float toi, float deltaTime)
+        protected override void ResolvePolygonCollision(RigidBody circleA, RigidBody circleB, in Vector2f normal, in float depth)
         {
 
         }

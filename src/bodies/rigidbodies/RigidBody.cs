@@ -9,15 +9,18 @@ namespace PhysicsEngine
     /**
      * Class for all physic bodies in the simulation
      */
-    public class RigidBody : Body
+    public class RigidBody //: Body
     {
-        // public new Collider Collider { get; protected set; }
+        public Vector2f Position { get; protected set; } // Position in m
+        public float Rotation { get; protected set; } // Rotation in grads
+        public Collider Collider { get; set; } // Collider for the object
         public Drawer RBDrawer { get; protected set; }
+        public float Mass { get; set; } // Mass in kg
         public Vector2f Velocity { get; set; } // Velocity in m/s
         public Vector2f Acceleration { get; set; } // Acceleration in m/s^2
         public float AngularVelocity { get; set; } // Angular velocity in rads/s
         public float AngularAcceleration { get; set; } // Angular acceleration in rads/s^2
-        public float Mass { get; set; } // Mass in kg
+        public bool IsStatic { get; set; } // Is the object static
 
 
         /**
@@ -31,23 +34,26 @@ namespace PhysicsEngine
         * @param angularVelocity The angular velocity of the object in rads/s
         */
         public RigidBody(in Collider collider, in Drawer drawer, float? rotation = 0, Vector2f? velocity = null, 
-                        Vector2f? acceleration = null, float? mass = null, float? angularVelocity = null)
-        :base(collider)
+                        Vector2f? acceleration = null, float? mass = null, float? angularVelocity = null, 
+                        float? angularAcceleration = null, bool isStatic = false)
         {
             Position = new Vector2f(0, 0);
             Rotation = rotation ?? 0;
+            Collider = collider;
             RBDrawer = drawer;
+            Mass = mass ?? 1;
             Velocity = velocity ?? new Vector2f(0, 0);
             Acceleration = acceleration ?? new Vector2f(0, 0);
             AngularVelocity = angularVelocity ?? 0;
-            Mass = mass ?? 1;
+            AngularAcceleration = angularAcceleration ?? 0;
+            IsStatic = isStatic;
         }
 
         /** 
         * Start method for the RigidBody class
         * @param position The position of the object in the scene at start
         */
-        public override void Start(Vector2f position)
+        public void Start(Vector2f position)
         {
             Position = position;
             Collider.UpdatePosition(Position, Rotation);
@@ -58,23 +64,24 @@ namespace PhysicsEngine
         * Update the state of the RigidBody
         * @param dt The change in time since the last frame
         */
-        public override void Update(in float deltaTime)
+        public void Update(in float deltaTime)
         {
-            Velocity += Acceleration * deltaTime;
-            // Velocity *= (1 - LinearDamping * deltaTime);
-            Position += Velocity * deltaTime;
-            Acceleration = new Vector2f(0, 0);
+            if (!IsStatic)
+            {
+                Velocity += Acceleration * deltaTime;
+                // Velocity *= (1 - LinearDamping * deltaTime);
+                Position += Velocity * deltaTime;
+                Acceleration = new Vector2f(0, 0);
 
-            AngularVelocity += AngularAcceleration * deltaTime;
-            // AngularVelocity *= (1 - AngularDamping * deltaTime);
-            Rotation += AngularVelocity * deltaTime;
-            if (Rotation > MathF.PI * 2)
-                Rotation -= MathF.PI * 2;
+                AngularVelocity += AngularAcceleration * deltaTime;
+                // AngularVelocity *= (1 - AngularDamping * deltaTime);
+                Rotation += AngularVelocity * deltaTime;
+                if (Rotation > MathF.PI * 2)
+                    Rotation -= MathF.PI * 2;
 
-            // Apply gravity if the object has mass
-            if (Mass > 0)
+                // Apply gravity if the object has mass
                 ApplyAcceleration(PhysicsConstants.GravityVector);
-            
+            }
             //Update the colliders position
             Collider.UpdatePosition(Position, Rotation);
             Collider.UpdateSweptAABB();
@@ -86,7 +93,7 @@ namespace PhysicsEngine
         *
         * Note: The position of the object is in meters, so we need to convert it to pixels
         */
-        public override void Draw()
+        public void Draw()
         {   
             RBDrawer.Draw(Position, Rotation);
 

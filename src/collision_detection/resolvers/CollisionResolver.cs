@@ -3,6 +3,7 @@ using SFML.Graphics;
 using SFML.Window;
 using SFML.System;
 using System.Data;
+using System.Text;
 
 namespace PhysicsEngine
 {
@@ -18,20 +19,62 @@ namespace PhysicsEngine
         * @param bodyA The first rigid body
         * @param bodyB The second rigid body
         */
-
-        public void ResolveCollision(Body bodyA, Body bodyB)
+        public void ResolveCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth)
         {
-            if (bodyA.Collider is CircleCollider && bodyB.Collider is CircleCollider)
-                ResolveCircleCollision(bodyA, bodyB);
+            if(bodyA.IsStatic && bodyB.IsStatic){
+                Console.WriteLine("Both bodies are static");
+                return;
+            }
+
+            Vector2f relativeVelocity = bodyA.Velocity - bodyB.Velocity;
             
-            else if (bodyA.Collider is CircleCollider && bodyB.Collider is PolygonCollider)
-                ResolveMixedCollision(bodyA, bodyB);
-            
-            else if (bodyB.Collider is PolygonCollider && bodyA.Collider is CircleCollider)
-                ResolveMixedCollision(bodyB, bodyA);
-            
-            else if (bodyA.Collider is PolygonCollider && bodyB.Collider is PolygonCollider)
-                ResolvePolygonCollision(bodyA, bodyB);
+            float velocityAlongNormal = relativeVelocity.Dot(normal);
+
+            Console.WriteLine("Velocity of A: " + bodyA.Velocity);
+            Console.WriteLine("Velocity of B: " + bodyB.Velocity);
+            Console.WriteLine("Relative velocity: " + relativeVelocity);
+            Console.WriteLine("Velocity along normal: " + velocityAlongNormal);
+
+            // if (velocityAlongNormal > 0)
+            // {
+            //     // Objects are moving apart, no need to resolve the collision
+            //     Console.WriteLine("Objects are moving apart, collision not resolved");
+            //     return;
+            // }
+
+            float restitution = Math.Min(bodyA.Collider.Elasticity, bodyB.Collider.Elasticity);
+
+            float j = -(1f + restitution) * relativeVelocity.Dot(normal);;
+
+            if(bodyA.IsStatic)
+            {
+                j /= 1f / bodyB.Mass;
+                bodyB.ApplyImpulse(-j * normal);
+
+                bodyB.UpdatePosition(bodyB.Position + normal * depth);
+            }
+            else if(bodyB.IsStatic)
+            {
+                j /= 1f / bodyA.Mass;
+                bodyA.ApplyImpulse(j * normal);
+
+                // bodyA.UpdatePosition(bodyA.Position - normal * depth);
+            }
+            else
+            {
+                j /= (1f / bodyA.Mass) + (1f / bodyB.Mass);
+                bodyA.ApplyImpulse(j * normal);
+                bodyB.ApplyImpulse(-j * normal);
+
+                bodyA.UpdatePosition(bodyA.Position - normal * depth / 2);
+                bodyB.UpdatePosition(bodyB.Position + normal * depth / 2);
+            }
+
+            // if(!bodyA.IsStatic)
+            //     bodyA.ApplyImpulse(j * normal);
+
+            // if(!bodyB.IsStatic)
+            //     bodyB.ApplyImpulse(-j * normal);
         }
 
 
@@ -40,9 +83,9 @@ namespace PhysicsEngine
         * @param circleA The first circle rigid body
         * @param circleB The second circle rigid body
         */
-        protected abstract void ResolveCircleCollision(Body circleA, Body circleB);
-        protected abstract void ResolveMixedCollision(Body circle, Body polygon);
-        protected abstract void ResolvePolygonCollision(Body polygonA, Body polygonB);
+        protected abstract void ResolveCircleCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth);
+        protected abstract void ResolveMixedCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth);
+        protected abstract void ResolvePolygonCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth);
         
     }
 }

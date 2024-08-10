@@ -29,7 +29,8 @@ namespace PhysicsEngine
         public PolygonRigidBody(in Vector2f[] vertices, in RenderWindow window, float? rotation = 0, 
                                 Color? color = null, float? elasticity = null, float? friction = null,
                                 float? mass = null, Vector2f? velocity = null, Vector2f? acceleration = null, 
-                                float? angularVelocity = null, bool solid = true)
+                                float? angularVelocity = null, float? angularAcceleration = null, 
+                                bool isStatic = false, bool solid = true)
         : base(
             new PolygonCollider(
                 position: new Vector2f(0, 0),
@@ -48,7 +49,9 @@ namespace PhysicsEngine
             velocity: velocity, 
             acceleration: acceleration, 
             rotation: rotation,
-            angularVelocity: angularVelocity
+            angularVelocity: angularVelocity,
+            angularAcceleration: angularAcceleration,
+            isStatic: isStatic
         )
         {
             Vertices = vertices;

@@ -51,16 +51,18 @@ namespace PhysicsEngine
         }
 
 
-        public override bool Intersects(in CircleCollider other)
+        public override bool Intersects(in CircleCollider other, out Vector2f normal, out float depth)
         {
             Vector2f collisionNormal = Position - other.Position;
             float distance = collisionNormal.Length();
+            normal = collisionNormal / distance;
+            depth = Radius + other.Radius - distance;
 
             return distance <= Radius + other.Radius;
         }
-        public override bool Intersects(in PolygonCollider other)
+        public override bool Intersects(in PolygonCollider other, out Vector2f normal, out float depth)
         {
-            return other.Intersects(this);
+            return other.Intersects(this, out normal, out depth);
         }
     }
 }
