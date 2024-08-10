@@ -12,24 +12,5 @@ namespace PhysicsEngine
     public class CCD : CollisionResolver
     {
         public override bool Discrete => false; // Continuous collision detection is enabled
-        /**
-        * Method to resolve a collision between two circle rigid bodies
-        * @param circleA The first circle rigid body
-        * @param circleB The second circle rigid body
-        * @param toi The time of impact
-        * @param deltaTime The change in time since the last frame
-        */
-        protected override void ResolveCircleCollision(RigidBody circleA, RigidBody circleB, in Vector2f normal, in float depth)
-        {
-
-        }
-        protected override void ResolveMixedCollision(RigidBody circleA, RigidBody circleB, in Vector2f normal, in float depth)
-        {
-
-        }
-        protected override void ResolvePolygonCollision(RigidBody circleA, RigidBody circleB, in Vector2f normal, in float depth)
-        {
-
-        }
     }
 }

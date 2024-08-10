@@ -26,41 +26,6 @@ namespace PhysicsEngine
         //  If they don't, return false (no collision)
         //Repeat for the other polygon
         //If both polygons intersect, return true (collision)
-
-
-
-
         public override bool Discrete => true; // Discrete collision detection is enabled
-        /**
-        * Method to resolve a collision between two circle rigid bodies
-        * @param circleA The first circle rigid body
-        * @param circleB The second circle rigid body
-        * @param toi The time of impact
-        * @param deltaTime The change in time since the last frame
-        */
-        protected override void ResolveCircleCollision(RigidBody circleA, RigidBody circleB, in Vector2f normal, in float depth){
-            Console.WriteLine("Circle collision");
-        }
-
-        /**
-        * Method to resolve a collision between a circle and a polygon rigid body
-        * @param circle The circle rigid body
-        * @param polygon The polygon rigid body
-        */
-        protected override void ResolveMixedCollision(RigidBody circleA, RigidBody circleB, in Vector2f normal, in float depth)
-        {
-            Console.WriteLine("Mixed collision");
-        }
-
-        /**
-        * Method to resolve a collision between a 2 polygons
-        * @param polygonA The first polygon rigid body
-        * @param polygonB The second polygon rigid body
-        */
-        protected override void ResolvePolygonCollision(RigidBody circleA, RigidBody circleB, in Vector2f normal, in float depth)
-        {
-            Console.WriteLine("Polygon collision");
-        }
-
     }
 }

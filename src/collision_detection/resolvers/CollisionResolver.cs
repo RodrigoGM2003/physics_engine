@@ -21,19 +21,15 @@ namespace PhysicsEngine
         */
         public void ResolveCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth)
         {
-            if(bodyA.IsStatic && bodyB.IsStatic){
-                Console.WriteLine("Both bodies are static");
+            if(bodyA.IsStatic && bodyB.IsStatic)
                 return;
-            }
+            
 
             Vector2f relativeVelocity = bodyA.Velocity - bodyB.Velocity;
             
             float velocityAlongNormal = relativeVelocity.Dot(normal);
 
-            Console.WriteLine("Velocity of A: " + bodyA.Velocity);
-            Console.WriteLine("Velocity of B: " + bodyB.Velocity);
-            Console.WriteLine("Relative velocity: " + relativeVelocity);
-            Console.WriteLine("Velocity along normal: " + velocityAlongNormal);
+
 
             // if (velocityAlongNormal > 0)
             // {
@@ -50,42 +46,23 @@ namespace PhysicsEngine
             {
                 j /= 1f / bodyB.Mass;
                 bodyB.ApplyImpulse(-j * normal);
-
-                bodyB.UpdatePosition(bodyB.Position + normal * depth);
+                // bodyB.UpdatePosition(bodyB.Position + normal * depth / 2);
             }
             else if(bodyB.IsStatic)
             {
                 j /= 1f / bodyA.Mass;
-                bodyA.ApplyImpulse(j * normal);
-
-                // bodyA.UpdatePosition(bodyA.Position - normal * depth);
+                bodyA.ApplyImpulse(j * normal);  
+                // bodyA.UpdatePosition(bodyA.Position - normal * depth / 2);
             }
             else
             {
                 j /= (1f / bodyA.Mass) + (1f / bodyB.Mass);
+                bodyA.UpdatePosition(bodyA.Position - normal * depth / 2);
+                bodyB.UpdatePosition(bodyB.Position + normal * depth / 2);
                 bodyA.ApplyImpulse(j * normal);
                 bodyB.ApplyImpulse(-j * normal);
 
-                bodyA.UpdatePosition(bodyA.Position - normal * depth / 2);
-                bodyB.UpdatePosition(bodyB.Position + normal * depth / 2);
             }
-
-            // if(!bodyA.IsStatic)
-            //     bodyA.ApplyImpulse(j * normal);
-
-            // if(!bodyB.IsStatic)
-            //     bodyB.ApplyImpulse(-j * normal);
-        }
-
-
-        /**
-        * Method to resolve a collision between two circle rigid bodies
-        * @param circleA The first circle rigid body
-        * @param circleB The second circle rigid body
-        */
-        protected abstract void ResolveCircleCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth);
-        protected abstract void ResolveMixedCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth);
-        protected abstract void ResolvePolygonCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth);
-        
+        }        
     }
 }

@@ -34,11 +34,11 @@ namespace PhysicsEngine
             SetSolid(solid);
         }
 
-                /**
-         * Calculate the centroid of a polygon
-         * @param vertices The vertices of the polygon
-         * @return The centroid of the polygon
-         */
+        /**
+        * Calculate the centroid of a polygon
+        * @param vertices The vertices of the polygon
+        * @return The centroid of the polygon
+        */
         private Vector2f CalculateCentroid(in Vector2f[] vertices)
         {
             float centroidX = 0, centroidY = 0;

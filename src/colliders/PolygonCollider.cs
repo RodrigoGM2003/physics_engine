@@ -105,6 +105,7 @@ namespace PhysicsEngine
         {
             normal = new Vector2f(0, 0);
             depth = float.MaxValue;
+
             // Calculate the true vertices of the polygon
             Vector2f[] thisTrueVertices = CalculateTrueVertices(Vertices, Position, Rotation);
 
@@ -135,11 +136,15 @@ namespace PhysicsEngine
 
                 //Calculate the depth of the intersection
                 float axisDepth = Math.Min(maxB - minA, maxA - minB);
+
                 if (axisDepth < depth){
                     depth = axisDepth;
                     normal = axis;
                 }
             }
+            //Normal should always point from the circle to the polygon
+            if (normal.Dot(Position - other.Position) < 0)
+                normal = -normal;
 
             //If all axes overlap, return true
             return true;
@@ -182,6 +187,10 @@ namespace PhysicsEngine
                     normal = axis;
                 }
             }
+            //Normal should always point from the other polygon to this polygon
+            if (normal.Dot(Position - other.Position) < 0)
+                normal = -normal;
+
             //If all axes overlap, return true
             return true;
         }
@@ -275,6 +284,20 @@ namespace PhysicsEngine
             }
             //Vertex and index of the closest vertex
             return closestVertex;
+        }
+
+        /**
+        * Get the center of the polygon
+        * @param vertices The vertices of the polygon
+        * @return The center of the polygon
+        */
+        private Vector2f GetCenter(Vector2f[] vertices){
+            Vector2f center = new Vector2f(0, 0);
+
+            foreach (Vector2f vertex in vertices)
+                center += vertex;
+            
+            return center / vertices.Length;
         }
     }
 }

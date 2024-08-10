@@ -97,22 +97,22 @@ namespace PhysicsEngine
         {   
             RBDrawer.Draw(Position, Rotation);
 
-            RectangleShape shape = new RectangleShape(Collider.SweptAABB.Size * PhysicsConstants.PixelsPerMeter);
-            shape.Position = new Vector2f(Collider.SweptAABB.Left * PhysicsConstants.PixelsPerMeter, Collider.SweptAABB.Top * PhysicsConstants.PixelsPerMeter);
-            shape.FillColor = Color.Transparent;
-            shape.OutlineColor = Color.Red;
-            shape.OutlineThickness = 1;
+            // RectangleShape shape = new RectangleShape(Collider.SweptAABB.Size * PhysicsConstants.PixelsPerMeter);
+            // shape.Position = new Vector2f(Collider.SweptAABB.Left * PhysicsConstants.PixelsPerMeter, Collider.SweptAABB.Top * PhysicsConstants.PixelsPerMeter);
+            // shape.FillColor = Color.Transparent;
+            // shape.OutlineColor = Color.Red;
+            // shape.OutlineThickness = 1;
 
-            RenderWindowManager.Window.Draw(shape);
+            // RenderWindowManager.Window.Draw(shape);
 
-            CircleShape circle = new CircleShape(Collider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, 30);
-            circle.Position = new Vector2f(Collider.LastPosition.X * PhysicsConstants.PixelsPerMeter, Collider.LastPosition.Y * PhysicsConstants.PixelsPerMeter);
-            circle.Origin = new Vector2f(Collider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, Collider.BoundingBox.Height / 2 * PhysicsConstants.PixelsPerMeter);
-            circle.FillColor = Color.Transparent;
-            circle.OutlineColor = Color.Red;
-            circle.OutlineThickness = 1;
+            // CircleShape circle = new CircleShape(Collider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, 30);
+            // circle.Position = new Vector2f(Collider.LastPosition.X * PhysicsConstants.PixelsPerMeter, Collider.LastPosition.Y * PhysicsConstants.PixelsPerMeter);
+            // circle.Origin = new Vector2f(Collider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, Collider.BoundingBox.Height / 2 * PhysicsConstants.PixelsPerMeter);
+            // circle.FillColor = Color.Transparent;
+            // circle.OutlineColor = Color.Red;
+            // circle.OutlineThickness = 1;
 
-            RenderWindowManager.Window.Draw(circle);
+            // RenderWindowManager.Window.Draw(circle);
 
             // circle = new CircleShape(Collider.BoundingBox.Width / 2 * PhysicsConstants.PixelsPerMeter, 30);
             // circle.Position = new Vector2f(Position.X * PhysicsConstants.PixelsPerMeter, Position.Y * PhysicsConstants.PixelsPerMeter);
