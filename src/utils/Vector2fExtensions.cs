@@ -25,7 +25,7 @@ namespace PhysicsEngine
         */
         public static float Dot(this Vector2f v1, Vector2f v2)
         {
-            return v1.X * v2.X + v1.Y * v2.Y;
+            return (v1.X * v2.X) + (v1.Y * v2.Y);
         }
 
         /**

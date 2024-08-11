@@ -143,8 +143,10 @@ namespace PhysicsEngine
                 }
             }
             //Normal should always point from the circle to the polygon
-            if (normal.Dot(Position - other.Position) < 0)
-                normal = -normal;
+            // if (normal.Dot(Position - other.Position) < 0){
+            //     // Console.WriteLine("Reversing normal ---------------------------------------------");
+            //     normal = -normal;
+            // }
 
             //If all axes overlap, return true
             return true;
@@ -188,8 +190,10 @@ namespace PhysicsEngine
                 }
             }
             //Normal should always point from the other polygon to this polygon
-            if (normal.Dot(Position - other.Position) < 0)
-                normal = -normal;
+            // if (normal.Dot(Position - other.Position) < 0){
+            //     // Console.WriteLine("Reversing normal ---------------------------------------------");
+            //     normal = -normal;
+            // }
 
             //If all axes overlap, return true
             return true;
