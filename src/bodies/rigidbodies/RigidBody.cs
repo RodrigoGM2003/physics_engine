@@ -82,7 +82,7 @@ namespace PhysicsEngine
                 AngularAcceleration = 0;
 
                 // Apply gravity if the object has mass
-                // ApplyAcceleration(PhysicsConstants.GravityVector);
+                ApplyAcceleration(PhysicsConstants.GravityVector);
             }
             //Update the colliders position
             Collider.UpdatePosition(Position, Rotation);
