@@ -5,6 +5,7 @@ using SFML.System;
 using System.Data;
 using System.Numerics;
 using System.Formats.Asn1;
+using System.Diagnostics;
 
 namespace PhysicsEngine
 {
@@ -22,8 +23,10 @@ namespace PhysicsEngine
         private static CollisionManager collisionManager;
         private static CollisionResolver collisionResolver;
         private static float speedFactor = 1f; // The speed factor of the simulation
-
+        
         private static int frames = 0;
+        private static float trueFPS = 0;
+        private static bool keepAdding = true;
 
         private static int collisions = 0;
 
@@ -105,7 +108,7 @@ namespace PhysicsEngine
             //     color: Color.Blue,
             //     mass: 1,
             //     // Random velocity between -20 and 20
-            //     velocity: new Vector2f(-10, 0),
+            //     velocity: new Vector2f(-30, 0),
             //     angularVelocity: 0,
             //     elasticity: 1f,
             //     friction: 0f
@@ -146,7 +149,6 @@ namespace PhysicsEngine
 
             // Create the clock
             clock = new Clock();
-
             // Main loop
             while (window.IsOpen)
             {
@@ -166,12 +168,10 @@ namespace PhysicsEngine
                 // Clear the window
 
                 window.Clear(Color.Black);
-                // Console.WriteLine("FPS: " + 1.0f / deltaTime);
-                // var framerate = 1.0f / deltaTime;
-                // Text framerateText = new Text($"FPS: {framerate:F2}", new Font("arial.ttf"), 20);
-                // framerateText.FillColor = Color.White;
-                // framerateText.Position = new Vector2f(10, 10);
-                // window.Draw(framerateText);
+                Text framerateText = new Text($"FPS: {trueFPS:F2}", new Font("arial.ttf"), 20);
+                framerateText.FillColor = Color.White;
+                framerateText.Position = new Vector2f(10, 10);
+                window.Draw(framerateText);
 
                 // Draw the scene
                 Draw(ref Bodies);
@@ -182,9 +182,35 @@ namespace PhysicsEngine
 
                 // Sleep if the frame time is too fast
                 float elapsed = clock.Restart().AsSeconds();
-                if (elapsed < FrameTime)
-                    System.Threading.Thread.Sleep((int)((FrameTime - elapsed) * 1000));
+
+                if(frames % ComputingConstants.FrameRate == 0){
+                    Console.WriteLine("----------------------------------------------");
+                    Console.WriteLine("Frames: " + frames);
+                    Console.WriteLine("Sim FPS: " + 1.0f / elapsed);
+                    Console.WriteLine("Elapsed: " + elapsed * 1000 + "ms");
+                    Console.WriteLine("Spare Time: " + (FrameTime - elapsed) * 1000 + "ms");
+
+                }
+                while (elapsed < FrameTime)
+                {
+                    elapsed = clock.ElapsedTime.AsSeconds();
+                }
+
+                // if (elapsed < FrameTime)
+                //     System.Threading.Thread.Sleep((int)((FrameTime - elapsed) * 1000));
+
+                // Stop the stopwatch
+                // stopwatch.Stop();
+
+                if(frames % ComputingConstants.FrameRate == 0){
+                    Console.WriteLine("Time elapsed after sleep: " + elapsed + "ms");
+                    Console.WriteLine("True FPS: " + 1.0f / (elapsed));
+                    Console.WriteLine("Number of bodies: " + Bodies.Length);
+                    Console.WriteLine("----------------------------------------------");
+                    trueFPS = 1.0f / (elapsed);
+                }
             }
+
         }
 
         /**
@@ -250,21 +276,22 @@ namespace PhysicsEngine
         private static void Update(ref RigidBody[] Bodies, float deltaTime)
         {
             frames++;
+
             //Every .5 seconds add a new body
-            if (frames % 15 == 0 && Bodies.Length < 300)
+            if (frames % 1 == 0 && Bodies.Length < 5000)
             {
-                Console.WriteLine("Adding new body");
+                // Console.WriteLine("Adding new body");
                 RigidBody newBody = new CircleRigidBody(
-                    radius: 1f,
+                    radius: .1f,
                     window: window,
                     // Random color
                     color: new Color((byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255)),
                     mass: 2,
                     // Random velocity between -20 and 20
-                    velocity: new Vector2f(20, 40),
+                    velocity: new Vector2f(50, 50),
                     // velocity: new Vector2f((float)new Random().Next(10, 30), (float)new Random().Next(10, 30)),
                     angularVelocity: 0,
-                    elasticity: 0.8f,
+                    elasticity: 1f,
                     friction: 0.1f
                 );
                 // Create a new array with a size larger by one
@@ -278,6 +305,34 @@ namespace PhysicsEngine
                 // Start the new body
                 Bodies[Bodies.Length - 1].Start(new Vector2f(20f, 20f));
             }
+            if (frames % 1 == 0 && Bodies.Length < 5000)
+            {
+                // Console.WriteLine("Adding new body");
+                RigidBody newBody = new CircleRigidBody(
+                    radius: .1f,
+                    window: window,
+                    // Random color
+                    color: new Color((byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255)),
+                    mass: 2,
+                    // Random velocity between -20 and 20
+                    velocity: new Vector2f(-50, 50),
+                    // velocity: new Vector2f((float)new Random().Next(10, 30), (float)new Random().Next(10, 30)),
+                    angularVelocity: 0,
+                    elasticity: 1f,
+                    friction: 0.1f
+                );
+                // Create a new array with a size larger by one
+                RigidBody[] newBodies = new RigidBody[Bodies.Length + 1];
+                // Copy the elements from the original array to the new array
+                Array.Copy(Bodies, newBodies, Bodies.Length);
+                // Add the new element to the end of the new array
+                newBodies[Bodies.Length] = newBody;
+                // Replace the original array with the new array
+                Bodies = newBodies;
+                // Start the new body
+                Bodies[Bodies.Length - 1].Start(new Vector2f(80f, 20f));
+            }
+
             // else if(frames % (15*10) == 0 && Bodies.Length == 500){
             //     Console.WriteLine("Adding new body");
             //     RigidBody newBody = new CircleRigidBody(
@@ -335,17 +390,17 @@ namespace PhysicsEngine
                     if(bodyA.IsStatic)
                     {
                         if(bToA.Dot(normal) < 0)
-                            bodyB.UpdatePosition(bodyB.Position + normal * depth * 1.1f);
+                            bodyB.UpdatePosition(bodyB.Position + normal * depth );//* 1.1f);
                         else
-                            bodyB.UpdatePosition(bodyB.Position - normal * depth * 1.1f);
+                            bodyB.UpdatePosition(bodyB.Position - normal * depth );//* 1.1f);
 
                     }
                     else if(bodyB.IsStatic)
                     {
                         if(aToB.Dot(normal) < 0)
-                            bodyA.UpdatePosition(bodyA.Position + normal * depth * 1.1f);
+                            bodyA.UpdatePosition(bodyA.Position + normal * depth );//* 1.1f);
                         else
-                            bodyA.UpdatePosition(bodyA.Position - normal * depth * 1.1f);
+                            bodyA.UpdatePosition(bodyA.Position - normal * depth );//* 1.1f);
 
                     }
                     else
