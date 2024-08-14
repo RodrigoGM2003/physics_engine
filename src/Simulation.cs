@@ -149,6 +149,9 @@ namespace PhysicsEngine
 
             // Create the clock
             clock = new Clock();
+
+            int substeps = 8;
+            float substepTime = FrameTime / substeps;
             // Main loop
             while (window.IsOpen)
             {
@@ -156,25 +159,61 @@ namespace PhysicsEngine
                 float deltaTime = clock.Restart().AsSeconds();
                 accumulatedTime += deltaTime;
 
+                //--------------------------------------------------------------------------------
+                //Every .5 seconds add a new body
+                if (frames % 2 == 0 && Bodies.Length < 5000)
+                {
+                    // Console.WriteLine("Adding new body");
+                    RigidBody newBody = new CircleRigidBody(
+                        //float random radius between 1 and 4
+                        radius: .2f,
+                        window: window,
+                        // Random color
+                        color: new Color((byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255)),
+                        mass: 2,
+                        // Random velocity between -20 and 20
+                        velocity: new Vector2f(-30, 30),
+                        // velocity: new Vector2f((float)new Random().Next(10, 30), (float)new Random().Next(10, 30)),
+                        angularVelocity: 0,
+                        elasticity: .7f,
+                        friction: 0.1f
+                    );
+                    // Create a new array with a size larger by one
+                    RigidBody[] newBodies = new RigidBody[Bodies.Length + 1];
+                    // Copy the elements from the original array to the new array
+                    Array.Copy(Bodies, newBodies, Bodies.Length);
+                    // Add the new element to the end of the new array
+                    newBodies[Bodies.Length] = newBody;
+                    // Replace the original array with the new array
+                    Bodies = newBodies;
+                    // Start the new body
+                    Bodies[Bodies.Length - 1].Start(new Vector2f(80f, 20f));
+                }
+                //--------------------------------------------------------------------------------
 
                 // Update the scene
                 while (accumulatedTime >= FrameTime )
                 {
                     window.DispatchEvents();
-                    Update(ref Bodies, FrameTime * speedFactor);
+                    for (int i = 0; i < substeps; i++)
+                    {
+                        // Update(ref Bodies, FrameTime * speedFactor);
+                        Update(ref Bodies, substepTime * speedFactor);
+                    }
                     accumulatedTime -= FrameTime;
                 }
 
                 // Clear the window
 
                 window.Clear(Color.Black);
-                Text framerateText = new Text($"FPS: {trueFPS:F2}", new Font("arial.ttf"), 20);
-                framerateText.FillColor = Color.White;
-                framerateText.Position = new Vector2f(10, 10);
-                window.Draw(framerateText);
+                // Text framerateText = new Text($"FPS: {trueFPS:F2}", new Font("arial.ttf"), 20);
+                // framerateText.FillColor = Color.White;
+                // framerateText.Position = new Vector2f(10, 10);
+                // window.Draw(framerateText);
 
                 // Draw the scene
                 Draw(ref Bodies);
+                frames++;
                 //Draw the real framerate on the right top corner of the window
 
 
@@ -275,93 +314,6 @@ namespace PhysicsEngine
          */
         private static void Update(ref RigidBody[] Bodies, float deltaTime)
         {
-            frames++;
-
-            //Every .5 seconds add a new body
-            if (frames % 1 == 0 && Bodies.Length < 5000)
-            {
-                // Console.WriteLine("Adding new body");
-                RigidBody newBody = new CircleRigidBody(
-                    radius: .1f,
-                    window: window,
-                    // Random color
-                    color: new Color((byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255)),
-                    mass: 2,
-                    // Random velocity between -20 and 20
-                    velocity: new Vector2f(50, 50),
-                    // velocity: new Vector2f((float)new Random().Next(10, 30), (float)new Random().Next(10, 30)),
-                    angularVelocity: 0,
-                    elasticity: 1f,
-                    friction: 0.1f
-                );
-                // Create a new array with a size larger by one
-                RigidBody[] newBodies = new RigidBody[Bodies.Length + 1];
-                // Copy the elements from the original array to the new array
-                Array.Copy(Bodies, newBodies, Bodies.Length);
-                // Add the new element to the end of the new array
-                newBodies[Bodies.Length] = newBody;
-                // Replace the original array with the new array
-                Bodies = newBodies;
-                // Start the new body
-                Bodies[Bodies.Length - 1].Start(new Vector2f(20f, 20f));
-            }
-            if (frames % 1 == 0 && Bodies.Length < 5000)
-            {
-                // Console.WriteLine("Adding new body");
-                RigidBody newBody = new CircleRigidBody(
-                    radius: .1f,
-                    window: window,
-                    // Random color
-                    color: new Color((byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255)),
-                    mass: 2,
-                    // Random velocity between -20 and 20
-                    velocity: new Vector2f(-50, 50),
-                    // velocity: new Vector2f((float)new Random().Next(10, 30), (float)new Random().Next(10, 30)),
-                    angularVelocity: 0,
-                    elasticity: 1f,
-                    friction: 0.1f
-                );
-                // Create a new array with a size larger by one
-                RigidBody[] newBodies = new RigidBody[Bodies.Length + 1];
-                // Copy the elements from the original array to the new array
-                Array.Copy(Bodies, newBodies, Bodies.Length);
-                // Add the new element to the end of the new array
-                newBodies[Bodies.Length] = newBody;
-                // Replace the original array with the new array
-                Bodies = newBodies;
-                // Start the new body
-                Bodies[Bodies.Length - 1].Start(new Vector2f(80f, 20f));
-            }
-
-            // else if(frames % (15*10) == 0 && Bodies.Length == 500){
-            //     Console.WriteLine("Adding new body");
-            //     RigidBody newBody = new CircleRigidBody(
-            //         radius: 10f,
-            //         window: window,
-            //         // Random color
-            //         color: new Color((byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255)),
-            //         mass: 10000,
-            //         // Random velocity between -20 and 20
-            //         velocity: new Vector2f(30, 30),
-            //         // velocity: new Vector2f((float)new Random().Next(10, 30), (float)new Random().Next(10, 30)),
-            //         angularVelocity: 0,
-            //         elasticity: .9f,
-            //         friction: 0.1f
-            //     );
-            //     // Create a new array with a size larger by one
-            //     RigidBody[] newBodies = new RigidBody[Bodies.Length + 1];
-            //     // Copy the elements from the original array to the new array
-            //     Array.Copy(Bodies, newBodies, Bodies.Length);
-            //     // Add the new element to the end of the new array
-            //     newBodies[Bodies.Length] = newBody;
-            //     // Replace the original array with the new array
-            //     Bodies = newBodies;
-            //     // Start the new body
-            //     Bodies[Bodies.Length - 1].Start(new Vector2f(20f, 20f));
-            // }
-
-
-
             foreach (RigidBody b in Bodies)
                 b.Update(deltaTime);
 
