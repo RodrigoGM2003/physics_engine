@@ -11,21 +11,94 @@ namespace PhysicsEngine
     */
     public class DCD : CollisionResolver
     {
-
-        // SAP theorem
-        //Ecuation to calculate the normal of an edge
-        //IMPORTANT: The order is counter-clockwise as every thing else is
-        //normal = y, -x
-
-        //SAP procedure
-        //Grab one of the 2 polygons
-        //  Calculate the normal one edge
-        //  Project all the vertices onto the normal (dot product of the vertex and the normal)
-        //  Calculate max and min of both polygons
-        //  If they intersect, continue
-        //  If they don't, return false (no collision)
-        //Repeat for the other polygon
-        //If both polygons intersect, return true (collision)
         public override bool Discrete => true; // Discrete collision detection is enabled
+
+        /**
+        * Method to handle an overlap between two rigid bodies
+        * @param bodyA The first rigid body
+        * @param bodyB The second rigid body
+        * @param normal The normal of the collision
+        * @param depth The depth of the collision
+        * @return Whether the collision must be resolved
+        * Implementation:
+        * - If one of the bodies is static, move the other body out of the collision
+        * - If both bodies are dynamic, move them both out of the collision
+        */
+        public override bool HandleOverlap(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth)
+        {
+            Vector2f aToB = bodyB.Position - bodyA.Position;
+            Vector2f bToA = bodyA.Position - bodyB.Position;
+
+            float checkA = aToB.Dot(bodyA.Velocity);
+            float checkB = bToA.Dot(bodyB.Velocity);
+
+            if(bodyA.IsStatic)
+            {
+                if(bToA.Dot(normal) < 0)
+                    bodyB.Position += normal * depth * 1.1f;
+                else
+                    bodyB.Position -= normal * depth * 1.1f;
+
+            }
+            else if(bodyB.IsStatic)
+            {
+                if(aToB.Dot(normal) < 0)
+                    bodyA.Position += normal * depth * 1.1f;
+                else
+                    bodyA.Position -= normal * depth * 1.1f;
+            }
+            else
+            {
+                if(bToA.Dot(normal) < 0)
+                {
+                    bodyA.Position -= normal * depth / 2 * 1.1f;
+                    bodyB.Position += normal * depth / 2 * 1.1f;
+                }
+                else
+                {
+                    bodyA.Position += normal * depth / 2 * 1.1f;
+                    bodyB.Position -= normal * depth / 2 * 1.1f;
+                }
+            }
+
+            return (checkA < 0 && checkB < 0);
+        }
+
+        /**
+        * Method to resolve a collision between two rigid bodies
+        * @param bodyA The first rigid body
+        * @param bodyB The second rigid body
+        * @param normal The normal of the collision
+        * @param depth The depth of the collision
+        * Implementation:
+        * - If one of the bodies is static, apply an impulse to the other body
+        * - If both bodies are dynamic, apply impulses to both bodies
+        */
+        public override void ResolveCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth)
+        {
+            Vector2f relativeVelocity = bodyA.Velocity - bodyB.Velocity;
+
+            float restitution = Math.Min(bodyA.Collider.Elasticity, bodyB.Collider.Elasticity);
+
+            float j = -(1f + restitution) * relativeVelocity.Dot(normal);;
+
+            if(bodyA.IsStatic)
+            {
+                j /= 1f / bodyB.Mass;
+                bodyB.ApplyImpulse(-j * normal);
+            }
+            else if(bodyB.IsStatic)
+            {
+                j /= 1f / bodyA.Mass;
+                bodyA.ApplyImpulse(j * normal);
+            }
+            else
+            {
+                j /= (1f / bodyA.Mass) + (1f / bodyB.Mass);
+
+                bodyA.ApplyImpulse(j * normal);
+                bodyB.ApplyImpulse(-j * normal);
+            }
+        }
     }
 }

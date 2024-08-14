@@ -12,5 +12,15 @@ namespace PhysicsEngine
     public class CCD : CollisionResolver
     {
         public override bool Discrete => false; // Continuous collision detection is enabled
+
+        public override void ResolveCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool HandleOverlap(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

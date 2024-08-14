@@ -6,12 +6,52 @@ using System.Data;
 using System.Numerics;
 using System.Formats.Asn1;
 using System.Diagnostics;
+using System.Reflection.Metadata;
 
 namespace PhysicsEngine
 {
     public static class RenderWindowManager
     {
-        public static RenderWindow Window { get; set; } = null!;
+        public static RenderWindow window { get; set; } = null!;
+                /**
+         * Event handler for when the window is closed
+         * @param sender The object that sent the event
+         * @param e The event arguments
+         */
+        public static void OnWindowClosed(object? sender, EventArgs e)
+        {
+            window.Close();
+        }
+
+        /**
+         * Event handler for when the window is resized
+         * @param sender The object that sent the event
+         * @param e The event arguments
+         */
+        public static void OnWindowResized(object? sender, SizeEventArgs e)
+        {
+            // Maintain aspect ratio
+            float windowAspect = e.Width / (float)e.Height;
+            float viewWidth = window.Size.X;
+            float viewHeight = window.Size.Y;
+            View view = window.GetView();
+
+
+            // Window is too wide
+            if (windowAspect > ComputingConstants.AspectRatio)
+            {
+                float newWidth = viewHeight * windowAspect;
+                view.Viewport = new FloatRect((1.0f - newWidth / viewWidth) / 2.0f, 0.0f, newWidth / viewWidth, 1.0f);
+            }
+            // Window is too tall
+            else
+            {
+                float newHeight = viewWidth / windowAspect;
+                view.Viewport = new FloatRect(0.0f, (1.0f - newHeight / viewHeight) / 2.0f, 1.0f, newHeight / viewHeight);
+            }
+
+            window.SetView(view);
+        }
     }
     class Simulation
     {
@@ -25,8 +65,8 @@ namespace PhysicsEngine
         private static float speedFactor = 1f; // The speed factor of the simulation
         
         private static int frames = 0;
+        public static int substeps = 8;
         private static float trueFPS = 0;
-        private static bool keepAdding = true;
 
         private static int collisions = 0;
 
@@ -40,13 +80,13 @@ namespace PhysicsEngine
             // Create the window
             window = new RenderWindow(new VideoMode(1000, 750), "SFML.NET Window");
             // window.SetFramerateLimit(60);
-            RenderWindowManager.Window = window;
-            window.Closed += OnWindowClosed;
-            window.Resized += OnWindowResized;
+            RenderWindowManager.window = window;
+            window.Closed += RenderWindowManager.OnWindowClosed;
+            window.Resized += RenderWindowManager.OnWindowResized;
 
 
             // Create the bodies
-            RigidBody[] Bodies = new RigidBody[4];
+            RigidBody[] Bodies = new RigidBody[5];
 
             Bodies[0] = new RectangleRigidBody(
                 size: new Vector2f(100, 20),
@@ -100,47 +140,20 @@ namespace PhysicsEngine
                 solid: false,
                 isStatic: true
             );
-
-            // Bodies[4] = new RectangleRigidBody(
-            //     size: new Vector2f(4, 4),
-            //     window: window,
-            //     // Random color
-            //     color: Color.Blue,
-            //     mass: 1,
-            //     // Random velocity between -20 and 20
-            //     velocity: new Vector2f(-30, 0),
-            //     angularVelocity: 0,
-            //     elasticity: 1f,
-            //     friction: 0f
-            // );
-
-            // Bodies[5] = new RectangleRigidBody(
-            //     size: new Vector2f(4, 4),
-            //     window: window,
-            //     // Random color
-            //     color: Color.Red,
-            //     mass: 1,
-            //     // Random velocity between -20 and 20
-            //     velocity: new Vector2f(0, 0),
-            //     angularVelocity: 0,
-            //     elasticity: 1f,
-            //     friction: 0f
-            // );
-            // Bodies[6] = new RectangleRigidBody(
-            //     size: new Vector2f(4, 4),
-            //     window: window,
-            //     // Random color
-            //     color: Color.Yellow,
-            //     mass: 1,
-            //     // Random velocity between -20 and 20
-            //     velocity: new Vector2f(0, 0),
-            //     angularVelocity: 0,
-            //     elasticity: 1f,
-            //     friction: 0f
-            // );
-
+            Bodies[4] = new RectangleRigidBody(
+                size: new Vector2f(5, 40),
+                window: window,
+                color: Color.Red, 
+                mass: 1f, 
+                velocity: new Vector2f(0, 0),
+                angularVelocity: MathF.PI,
+                elasticity: 1f,
+                friction: 0f,
+                rotation: 1,
+                solid: false,
+                isStatic: true
+            );
             
-
             collisionResolver = new DCD();
             collisionManager = new CollisionManager(Bodies, discrete: collisionResolver.Discrete);
 
@@ -150,7 +163,6 @@ namespace PhysicsEngine
             // Create the clock
             clock = new Clock();
 
-            int substeps = 8;
             float substepTime = FrameTime / substeps;
             // Main loop
             while (window.IsOpen)
@@ -161,7 +173,7 @@ namespace PhysicsEngine
 
                 //--------------------------------------------------------------------------------
                 //Every .5 seconds add a new body
-                if (frames % 2 == 0 && Bodies.Length < 5000)
+                if (frames % 2 == 0 && Bodies.Length < 1000)
                 {
                     // Console.WriteLine("Adding new body");
                     RigidBody newBody = new CircleRigidBody(
@@ -170,9 +182,9 @@ namespace PhysicsEngine
                         window: window,
                         // Random color
                         color: new Color((byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255)),
-                        mass: 2,
+                        mass: 1,
                         // Random velocity between -20 and 20
-                        velocity: new Vector2f(-30, 30),
+                        velocity: new Vector2f(-20, -20),
                         // velocity: new Vector2f((float)new Random().Next(10, 30), (float)new Random().Next(10, 30)),
                         angularVelocity: 0,
                         elasticity: .7f,
@@ -187,7 +199,7 @@ namespace PhysicsEngine
                     // Replace the original array with the new array
                     Bodies = newBodies;
                     // Start the new body
-                    Bodies[Bodies.Length - 1].Start(new Vector2f(80f, 20f));
+                    Bodies[Bodies.Length - 1].Start(new Vector2f(85f, 40f));
                 }
                 //--------------------------------------------------------------------------------
 
@@ -195,28 +207,28 @@ namespace PhysicsEngine
                 while (accumulatedTime >= FrameTime )
                 {
                     window.DispatchEvents();
+
                     for (int i = 0; i < substeps; i++)
-                    {
-                        // Update(ref Bodies, FrameTime * speedFactor);
                         Update(ref Bodies, substepTime * speedFactor);
-                    }
+
                     accumulatedTime -= FrameTime;
                 }
 
-                // Clear the window
+                // if(Bodies[4].Position.X > 70)
+                // {
+                //     Bodies[4].Velocity = new Vector2f(-20, 0);
+                // }
+                // else if(Bodies[4].Position.X < 30)
+                // {
+                //     Bodies[4].Velocity = new Vector2f(20, 0);
+                // }
 
+                // Clear the window
                 window.Clear(Color.Black);
-                // Text framerateText = new Text($"FPS: {trueFPS:F2}", new Font("arial.ttf"), 20);
-                // framerateText.FillColor = Color.White;
-                // framerateText.Position = new Vector2f(10, 10);
-                // window.Draw(framerateText);
 
                 // Draw the scene
                 Draw(ref Bodies);
                 frames++;
-                //Draw the real framerate on the right top corner of the window
-
-
                 window.Display();
 
                 // Sleep if the frame time is too fast
@@ -231,66 +243,18 @@ namespace PhysicsEngine
 
                 }
                 while (elapsed < FrameTime)
-                {
                     elapsed = clock.ElapsedTime.AsSeconds();
-                }
+                
 
-                // if (elapsed < FrameTime)
-                //     System.Threading.Thread.Sleep((int)((FrameTime - elapsed) * 1000));
-
-                // Stop the stopwatch
-                // stopwatch.Stop();
-
-                if(frames % ComputingConstants.FrameRate == 0){
+                if(frames % ComputingConstants.FrameRate == 0)
+                {
                     Console.WriteLine("Time elapsed after sleep: " + elapsed + "ms");
                     Console.WriteLine("True FPS: " + 1.0f / (elapsed));
                     Console.WriteLine("Number of bodies: " + Bodies.Length);
                     Console.WriteLine("----------------------------------------------");
-                    trueFPS = 1.0f / (elapsed);
                 }
             }
 
-        }
-
-        /**
-         * Event handler for when the window is closed
-         * @param sender The object that sent the event
-         * @param e The event arguments
-         */
-        private static void OnWindowClosed(object? sender, EventArgs e)
-        {
-            Console.WriteLine("Collisions: " + collisions);
-            window.Close();
-        }
-
-        /**
-         * Event handler for when the window is resized
-         * @param sender The object that sent the event
-         * @param e The event arguments
-         */
-        private static void OnWindowResized(object? sender, SizeEventArgs e)
-        {
-            // Maintain aspect ratio
-            float windowAspect = e.Width / (float)e.Height;
-            float viewWidth = window.Size.X;
-            float viewHeight = window.Size.Y;
-            View view = window.GetView();
-
-
-            // Window is too wide
-            if (windowAspect > AspectRatio)
-            {
-                float newWidth = viewHeight * windowAspect;
-                view.Viewport = new FloatRect((1.0f - newWidth / viewWidth) / 2.0f, 0.0f, newWidth / viewWidth, 1.0f);
-            }
-            // Window is too tall
-            else
-            {
-                float newHeight = viewWidth / windowAspect;
-                view.Viewport = new FloatRect(0.0f, (1.0f - newHeight / viewHeight) / 2.0f, 1.0f, newHeight / viewHeight);
-            }
-
-            window.SetView(view);
         }
 
         /**
@@ -303,9 +267,7 @@ namespace PhysicsEngine
             Bodies[1].Start(new Vector2f(50f, 75f));
             Bodies[2].Start(new Vector2f(0f, 75/2));
             Bodies[3].Start(new Vector2f(100f, 75/2));
-            // Bodies[4].Start(new Vector2f(50f, 63f));
-            // Bodies[5].Start(new Vector2f(30f, 63f));
-            // Bodies[6].Start(new Vector2f(34f, 63f));
+            Bodies[4].Start(new Vector2f(50f, 75/2f + 15));
         }
 
         /**
@@ -317,7 +279,7 @@ namespace PhysicsEngine
             foreach (RigidBody b in Bodies)
                 b.Update(deltaTime);
 
-            collisionManager.UpdateBVH(Bodies.ToArray());
+            collisionManager.UpdateBVH(Bodies);
 
             var potentialCollisions = collisionManager.GetPotentialCollisions();
 
@@ -330,49 +292,9 @@ namespace PhysicsEngine
                 float depth;
                 if (bodyA.Collider.Intersects(bodyB.Collider, out normal, out depth))
                 {
-                    if(bodyA.IsStatic && bodyB.IsStatic)
+                    if(collisionResolver.HandleOverlap(bodyA, bodyB, normal, depth))
                         continue;
-
-                    Vector2f aToB = bodyB.Position - bodyA.Position;
-                    Vector2f bToA = bodyA.Position - bodyB.Position;
-
-                    float checkA = aToB.Dot(bodyA.Velocity);
-                    float checkB = bToA.Dot(bodyB.Velocity);
-
-                    if(bodyA.IsStatic)
-                    {
-                        if(bToA.Dot(normal) < 0)
-                            bodyB.UpdatePosition(bodyB.Position + normal * depth );//* 1.1f);
-                        else
-                            bodyB.UpdatePosition(bodyB.Position - normal * depth );//* 1.1f);
-
-                    }
-                    else if(bodyB.IsStatic)
-                    {
-                        if(aToB.Dot(normal) < 0)
-                            bodyA.UpdatePosition(bodyA.Position + normal * depth );//* 1.1f);
-                        else
-                            bodyA.UpdatePosition(bodyA.Position - normal * depth );//* 1.1f);
-
-                    }
-                    else
-                    {
-                        collisions++;
-                        // Console.WriteLine("Collisions: " + collisions);
-                        if(bToA.Dot(normal) < 0)
-                        {
-                            bodyB.UpdatePosition(bodyB.Position + normal * depth * 1.1f / 2);
-                            bodyA.UpdatePosition(bodyA.Position - normal * depth * 1.1f / 2);
-                        }
-                        else
-                        {
-                            bodyA.UpdatePosition(bodyA.Position + normal * depth * 1.1f / 2);
-                            bodyB.UpdatePosition(bodyB.Position - normal * depth * 1.1f / 2);
-                        }
-                    }
-                    
-                    if(checkA < 0 && checkB < 0)
-                        continue;
+                        
                     collisionResolver.ResolveCollision(bodyA, bodyB, normal, depth);
                 }
                 

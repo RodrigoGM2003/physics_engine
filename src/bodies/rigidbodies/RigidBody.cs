@@ -11,17 +11,58 @@ namespace PhysicsEngine
      */
     public class RigidBody //: Body
     {
-        public Vector2f Position { get; protected set; } // Position in m
-        public float Rotation { get; protected set; } // Rotation in grads
-        public Collider Collider { get; set; } // Collider for the object
+        private float _mass; // Mass in kg
+        private float _inverseMass; // Inverse mass in kg^-1
+        private bool _isStatic; // Whether the object is static or dynamic
+        private Vector2f _position; // Position in m
+        private float _rotation; // Rotation in grads
+
+        public Collider Collider { get; protected set; } // Collider for the object
         public Drawer RBDrawer { get; protected set; }
-        public float Mass { get; set; } // Mass in kg
         public Vector2f Velocity { get; set; } // Velocity in m/s
         public Vector2f Acceleration { get; set; } // Acceleration in m/s^2
         public float AngularVelocity { get; set; } // Angular velocity in rads/s
         public float AngularAcceleration { get; set; } // Angular acceleration in rads/s^2
-        public bool IsStatic { get; set; } // Is the object static
+        public Vector2f Position // Property for the position of the object
+        {
+            get => _position;
+            set
+            {
+                _position = value;
+                Collider.UpdatePosition(_position, _rotation);
+                Collider.UpdateSweptAABB();
+            }
+        }
 
+        public float Rotation // Property for the rotation of the object
+        {
+            get => _rotation;
+            set
+            {
+                _rotation = value;
+                Collider.UpdatePosition(_position, _rotation);
+                Collider.UpdateSweptAABB();
+            }
+        }
+        public float Mass // Property for the mass of the object
+        {
+            get => _mass;
+            set
+            {
+                _mass = value;
+                UpdateInverseMass();
+            }
+        }
+        public float InverseMass => _inverseMass; // Property for the inverse mass of the object
+        public bool IsStatic // Property for the staticness of the object
+        {
+            get => _isStatic;
+            set
+            {
+                _isStatic = value;
+                UpdateInverseMass();
+            }
+        }
 
         /**
         * Constructor for the RigidBody class
@@ -37,15 +78,19 @@ namespace PhysicsEngine
                         Vector2f? acceleration = null, float? mass = null, float? angularVelocity = null, 
                         float? angularAcceleration = null, bool isStatic = false)
         {
-            Position = new Vector2f(0, 0);
-            Rotation = rotation ?? 0;
             Collider = collider;
             RBDrawer = drawer;
+
+            Position = new Vector2f(0, 0);
+            Rotation = rotation ?? 0;
+
             Mass = mass ?? 1;
+
             Velocity = velocity ?? new Vector2f(0, 0);
             Acceleration = acceleration ?? new Vector2f(0, 0);
             AngularVelocity = angularVelocity ?? 0;
             AngularAcceleration = angularAcceleration ?? 0;
+
             IsStatic = isStatic;
         }
 
@@ -56,8 +101,6 @@ namespace PhysicsEngine
         public void Start(Vector2f position)
         {
             Position = position;
-            Collider.UpdatePosition(Position, Rotation);
-            Collider.UpdateSweptAABB();
         }
 
         /**
@@ -66,20 +109,15 @@ namespace PhysicsEngine
         */
         public void Update(in float deltaTime)
         {
+            Velocity += Acceleration * deltaTime;
+            Position += Velocity * deltaTime;
+            AngularVelocity += AngularAcceleration * deltaTime;
+            Rotation = Rotation + AngularVelocity * deltaTime % (MathF.PI * 2);
+            AngularAcceleration = 0;
+            Acceleration = new Vector2f(0, 0);
             if (!IsStatic)
             {
-                Velocity += Acceleration * deltaTime;
-                // Velocity *= (1 - LinearDamping * deltaTime);
-                Position += Velocity * deltaTime;
-                Acceleration = new Vector2f(0, 0);
 
-                AngularVelocity += AngularAcceleration * deltaTime;
-                // AngularVelocity *= (1 - AngularDamping * deltaTime);
-                Rotation += AngularVelocity * deltaTime;
-                if (Rotation > MathF.PI * 2)
-                    Rotation -= MathF.PI * 2;
-
-                AngularAcceleration = 0;
 
                 // Apply gravity if the object has mass
                 ApplyAcceleration(PhysicsConstants.GravityVector);
@@ -125,13 +163,6 @@ namespace PhysicsEngine
             // RenderWindowManager.Window.Draw(circle);
         }
 
-        public void UpdatePosition(Vector2f position)
-        {
-            Position = position;
-            Collider.UpdatePosition(position, Rotation);
-            Collider.UpdateSweptAABB();
-        }
-
         /**
         * Apply a force to the RigidBody
         * @param force The force to apply to the object
@@ -159,6 +190,14 @@ namespace PhysicsEngine
         public void ApplyAcceleration(Vector2f acceleration)
         {
             Acceleration += acceleration;
+        }
+
+        /**
+        * Update the value of inverse mass of the object
+        */
+        private void UpdateInverseMass() // Method to update the inverse mass of the object
+        {
+            _inverseMass = _isStatic ? 0 : 1 / _mass;
         }
     }
 }
