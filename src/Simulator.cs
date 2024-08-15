@@ -1,12 +1,6 @@
-using System;
 using SFML.Graphics;
-using SFML.Window;
 using SFML.System;
-using System.Data;
-using System.Numerics;
-using System.Formats.Asn1;
-using System.Diagnostics;
-using System.Security.AccessControl;
+
 
 namespace PhysicsEngine
 {
@@ -14,32 +8,28 @@ namespace PhysicsEngine
     {
         public static readonly int MaxSubsteps = 128; // The maximum number of substeps to take per frame
         public static readonly int MinSubsteps = 1; // The minimum number of substeps to take per frame
+
         public required RigidBody[] Bodies { get; set; } = new RigidBody[1000]; // The array of bodies in the scene
         public int numBodies { get; set; } = 0; // The number of bodies in the scene
         // public required LogicObject[] Objects { get; set; } = new LogicObject[1000]; // The array of objects in the scene
-        private string scene { get; set; } = ""; // The scene of the scene
+
         public required RenderWindow window { get; set; } // The window to draw to
+
         public required CollisionManager collisionManager { get; set; } // The collision manager for the scene
         public required CollisionResolver collisionResolver { get; set; } // The collision resolver for the scene
-        public required Clock clock { get; set; } // The clock to keep track of time
+
         public float speedFactor { get; set; } = 1f; // The speed factor of the simulation
         public int substeps { get; set; } = 8; // The number of substeps to take per frame
-        private float accumulatedTime { get; set; } = 0; // The time that has accumulated since the last frame
-        // private static float AspectRatio = ComputingConstants.AspectRatio;  // Desired aspect ratio (e.g., 4:3)
-        // private static readonly float FrameTime = 1.0f / ComputingConstants.FrameRate;   // Frame time for 60 FPS
-        // private static RenderWindow window = null!; // The window to draw to
-        // private static Clock clock = null!; // The clock to keep track of time
-        // private static float accumulatedTime = 0.0f; // The time that has accumulated since the last frame
-        // private static CollisionManager collisionManager;
-        // private static CollisionResolver collisionResolver;
-        // private static float speedFactor = 1f; // The speed factor of the simulation
-        
-        // private static int frames = 0;
-        // public static int substeps = 8;
-        // private static float trueFPS = 0;
+        private double accumulatedTime { get; set; } = 0; // The time that has accumulated since the last frame
 
-        // private static int collisions = 0;
-
+        /**
+        * Base constructor for the Simulator class
+        * @param window The window to draw to
+        * @param collisionManager The collision manager for the scene
+        * @param collisionResolver The collision resolver for the scene
+        * @param speedFactor The speed factor of the simulation
+        * @param substeps The number of substeps to take per frame
+        */
         public Simulator(RenderWindow window, CollisionManager collisionManager, CollisionResolver collisionResolver, 
                         float speedFactor = 1, int substeps = ComputingConstants.DefaultSubsteps)
         {
@@ -56,7 +46,8 @@ namespace PhysicsEngine
 
         public Simulator(in string sceneName)
         {
-            throw new NotImplementedException();
+            var sceneReader = new SceneReader(sceneName);
+            sceneReader.ReadScene();
         }
 
 
@@ -65,11 +56,10 @@ namespace PhysicsEngine
             Start();
 
             // Create the clock
-            clock = new Clock();
-
+            var clock = new Clock();
             float frameTime = 1 / ComputingConstants.FrameRate;
-
             float substepTime = 1 / (substeps * ComputingConstants.FrameRate);
+            
             // Main loop
             while (window.IsOpen)
             {
@@ -96,9 +86,16 @@ namespace PhysicsEngine
                 Draw();
                 window.Display();
 
-                // Sleep if the frame time is too fast
-                float elapsed = clock.Restart().AsSeconds();
+                //If framerate is too low, add a delay to keep the framerate constant
+                double elapsed = clock.ElapsedTime.AsSeconds();
+                if (elapsed > frameTime)
+                    accumulatedTime += frameTime;
+                else
+                    accumulatedTime += elapsed;
+                
+                clock.Restart();
 
+                // Sleep if the frame time is too fast
                 while (elapsed < frameTime)
                     elapsed = clock.ElapsedTime.AsSeconds();
             }
@@ -123,7 +120,7 @@ namespace PhysicsEngine
             for(int i = 0; i < numBodies; i++)
                 Bodies[i].Update(deltaTime);
 
-            collisionManager.UpdateBVH(Bodies);
+            collisionManager.UpdateBVH(Bodies, usedBodiesCount: numBodies);
 
             var potentialCollisions = collisionManager.GetPotentialCollisions();
 

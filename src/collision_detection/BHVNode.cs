@@ -52,7 +52,7 @@ namespace PhysicsEngine
             shape.OutlineColor = Color.Green;
             shape.OutlineThickness = 1;
 
-            RenderWindowManager.Window.Draw(shape);
+            RenderWindowManager.window.Draw(shape);
 
             if (Left != null)
                 Left.Draw();

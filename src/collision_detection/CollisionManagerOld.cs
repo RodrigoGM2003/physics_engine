@@ -6,19 +6,19 @@ using System.Data;
 
 namespace PhysicsEngine
 {
-    public class CollisionManager
+    public class CollisionManagerOld
     {
         public BVHNode root {get; set;} // The root of the bounding volume hierarchy
         public bool Discrete {get; set;} // Whether continuous collision detection is enabled
 
         /**
-         * Constructor for the CollisionManager2 class
+         * Constructor for the CollisionManagerOld class
          * @param bodies The bodies in the scene
          */
-        public CollisionManager(RigidBody[] bodies, int usedBodiesCount, bool discrete)
+        public CollisionManagerOld(RigidBody[] bodies, bool discrete)
         {
             Discrete = discrete;
-            root = BuildBVH(bodies, 0, usedBodiesCount, 0);
+            root = BuildBVH(bodies, 0);
         }
 
         /**
@@ -26,40 +26,42 @@ namespace PhysicsEngine
          * @param bodies The bodies in the scene
          * @param depth The depth of the node in the hierarchy
          */
-        private BVHNode BuildBVH(RigidBody[] bodies, int startIndex, int endIndex, int depth)
+        private BVHNode BuildBVH(RigidBody[] bodies, int depth)
         {
-            int usedBodiesCount = endIndex - startIndex;
 
             // If there is only one body, return a node with that body
-            if (usedBodiesCount == 1)
-                return new BVHNode(bodies[startIndex], Discrete);
+            if (bodies.Length == 1)
+                return new BVHNode(bodies[0], Discrete);
 
             // Sort the bodies based on the axis
             int axis = depth % 2;
             if (axis == 0)
-                Array.Sort(bodies, startIndex, usedBodiesCount, Comparer<RigidBody>.Create((b1, b2) => b1.Position.X.CompareTo(b2.Position.X)));
+                // bodies = bodies.OrderBy(b => b.Position.X).ToArray();
+                Array.Sort(bodies, (b1, b2) => b1.Position.X.CompareTo(b2.Position.X));
             else
-                Array.Sort(bodies, startIndex, usedBodiesCount, Comparer<RigidBody>.Create((b1, b2) => b1.Position.Y.CompareTo(b2.Position.Y)));
+                // bodies = bodies.OrderBy(b => b.Position.Y).ToArray();
+                Array.Sort(bodies, (b1, b2) => b1.Position.Y.CompareTo(b2.Position.Y));
+
 
             // Split the bodies into two halves
-            int medianIndex = startIndex + usedBodiesCount / 2;
+            int medianIndex = bodies.Length / 2;
+            var leftBodies = bodies.Take(medianIndex).ToArray();
+            var rightBodies = bodies.Skip(medianIndex).ToArray();
 
-            // Build the left and right nodes using indices to avoid creating new arrays
-            var leftNode = BuildBVH(bodies, startIndex, medianIndex, depth + 1);
-            var rightNode = BuildBVH(bodies, medianIndex, endIndex, depth + 1);
+            // Build the left and right nodes
+            var leftNode = BuildBVH(leftBodies, depth + 1);
+            var rightNode = BuildBVH(rightBodies, depth + 1);
 
             return new BVHNode(leftNode, rightNode);
         }
-
-
 
         /**
          * Update the bounding volume hierarchy
          * @param bodies The bodies in the scene
          */
-        public void UpdateBVH(RigidBody[] bodies, int usedBodiesCount)
+        public void UpdateBVH(RigidBody[] bodies)
         {
-            root = BuildBVH(bodies, 0, usedBodiesCount, 0);
+            root = BuildBVH(bodies, 0);
         }
 
         /**

@@ -14,7 +14,12 @@ namespace PhysicsEngine
 
         public const float Gravity = 9.81f;
 
-        public static readonly Vector2f GravityVector = new Vector2f(0, Gravity);
+        public static Vector2f GravityVector
+        {
+            get{
+                return new Vector2f(0.0f, Gravity);
+            }
+        }
 
         public static readonly float DefaultElasticity = 0.5f;
         public static readonly float DefaultFriction = 0.5f;
