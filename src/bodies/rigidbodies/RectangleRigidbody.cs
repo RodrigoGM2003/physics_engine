@@ -66,5 +66,36 @@ namespace PhysicsEngine
         {
             Size = size;
         }
+        public RectangleRigidBody(in RenderWindow window)
+        : base(
+            new PolygonCollider(
+                position: new Vector2f(0, 0), 
+                vertices: new Vector2f[] {
+                    new Vector2f(-0.5f, -0.5f),
+                    new Vector2f(-0.5f, 0.5f),
+                    new Vector2f(0.5f, 0.5f),
+                    new Vector2f(0.5f, -0.5f)
+                }, 
+                elasticity: PhysicsConstants.DefaultElasticity, 
+                friction: PhysicsConstants.DefaultFriction, 
+                rotation: 0
+            ), 
+            new RectangleDrawer(
+                _window: window, 
+                size: new Vector2f (1f, 1f) * PhysicsConstants.PixelsPerMeter, 
+                color: Color.White,
+                solid: true
+            ), 
+            mass: 1,
+            velocity: new Vector2f(0, 0),
+            acceleration: new Vector2f(0, 0),
+            rotation: 0,
+            angularVelocity: 0,
+            angularAcceleration: 0,
+            isStatic: false
+        )
+        {
+            Size = new Vector2f(1, 1);
+        }
     }
 }

@@ -41,5 +41,31 @@ namespace PhysicsEngine
             }
             return fixedVertices;
         }
+
+        public static int ReadInt(in string line, in string filter)
+        {
+            // Extract the float value after filter
+            string value = line.Substring(filter.Length).Trim();
+            return int.Parse(value, ComputingConstants.CultureInfo);
+        }
+        public static float ReadFloat(in string line, in string filter)
+        {
+            // Extract the float value after filter
+            string value = line.Substring(filter.Length).Trim();
+            return float.Parse(value, ComputingConstants.CultureInfo);
+        }
+        public static Vector2f ReadVector2f(in string line, in string filter)
+        {
+            // Extract the value after "position:"
+            string value = line.Substring(filter.Length).Trim();
+            string[] parts = value.Split(',');
+            if(parts.Length == 2 && float.TryParse(parts[0], ComputingConstants.CultureInfo, out float x) && 
+                                    float.TryParse(parts[1], ComputingConstants.CultureInfo, out float y))
+                return new Vector2f(x, y);
+            else{
+                Console.WriteLine("Invalid position value in body ");
+                return new Vector2f(0, 0);
+            }
+        }
     }
 }

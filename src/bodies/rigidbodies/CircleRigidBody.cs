@@ -57,5 +57,31 @@ namespace PhysicsEngine
         {
             Radius = radius;
         }
+        public CircleRigidBody(in RenderWindow window)
+        : base(
+            new CircleCollider(
+                position: new Vector2f(0, 0), 
+                radius: 1, 
+                elasticity: PhysicsConstants.DefaultElasticity, 
+                friction: PhysicsConstants.DefaultFriction, 
+                rotation: 0
+            ), 
+            new CircleDrawer(
+                _window: window, 
+                radius: 1 *  PhysicsConstants.PixelsPerMeter, 
+                color: Color.White,
+                solid: true
+            ), 
+            mass: 1, 
+            velocity: new Vector2f(0, 0),
+            acceleration: new Vector2f(0, 0),
+            rotation: 0,
+            angularVelocity: 0,
+            angularAcceleration: 0,
+            isStatic: false
+        )
+        {
+            Radius = 1;
+        }
     }
 }

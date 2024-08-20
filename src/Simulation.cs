@@ -80,6 +80,8 @@ namespace PhysicsEngine
             window.Closed += RenderWindowManager.OnWindowClosed;
             window.Resized += RenderWindowManager.OnWindowResized;
 
+            var sim = new Simulator("scenes/scene1.scn");
+
 
             // Create the bodies
             RigidBody[] Bodies = new RigidBody[2500];

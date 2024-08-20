@@ -1,28 +1,20 @@
 using SFML.Graphics;
 using SFML.Window;
 using SFML.System;
+using System.IO;
+using System.Runtime.CompilerServices;
 
 namespace PhysicsEngine
 {
-    public class SceneReader
+    public static class SceneReader
     {
-        public string scene { get; set; } = ""; // The name of the scene
 
-        public SceneReader(in string scene)
-        {
-            this.scene = scene;
-        }
+        /**
+        * Reads a scene from a file and returns a Simulator object representing the scene
+        * @param sceneName The name of the scene file to read
+        * @return A Simulator object representing the scene
+        */
 
-        public void ReadScene()
-        {
-            // Read the scene from the file
-            // Parse the scene
-            // Create the bodies
-            // Create the objects
-            // Create the collision manager
-            // Create the collision resolver
-            // Create the simulator
-            // Run the simulator
-        }
+
     }
 }

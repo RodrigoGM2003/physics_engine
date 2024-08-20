@@ -23,5 +23,6 @@ namespace PhysicsEngine
 
         public static readonly float DefaultElasticity = 0.5f;
         public static readonly float DefaultFriction = 0.5f;
+        public static readonly float DefaultSpeedFactor = 1.0f;
     }
 }
