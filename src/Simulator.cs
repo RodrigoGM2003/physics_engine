@@ -13,6 +13,7 @@ namespace PhysicsEngine
         public static readonly int MinSubsteps = 1; // The minimum number of substeps to take per frame
 
         public RigidBody[] Bodies { get; set; } = new RigidBody[1000]; // The array of bodies in the scene
+        public Vector2f[] StartPositions { get; set; } = new Vector2f[1000]; // The start conditions of the bodies in the scene
         public int usedBodies { get; set; } = 0; // The number of bodies in the scene
         // public /*required*/ LogicObject[] Objects { get; set; } = new LogicObject[1000]; // The array of objects in the scene
 
@@ -70,7 +71,7 @@ namespace PhysicsEngine
                     Vector2f gravityVector = PhysicsConstants.GravityVector;
                     string collisionManagerType = "classic";
                     bool discrete = true;
-                    CollisionResolver collisionResolver = new DCD();
+                    this.collisionResolver = new DCD();
                     float speedFactor = PhysicsConstants.DefaultSpeedFactor;
                     int substeps = ComputingConstants.DefaultSubsteps;
 
@@ -85,8 +86,16 @@ namespace PhysicsEngine
                     while((line = sr.ReadLine()) != "#EndSettings")
                     {
                         //------------------------------------AspectRatio------------------------------------//
-                        if(line.StartsWith("AspectRatio:"))
-                            aspectRatio = Utils.ReadFloat(in line, "AspectRatio:");
+                        if(line.StartsWith("AspectRatio:")){
+                            //Read a division of two floats
+                            value = line.Substring("AspectRatio:".Length).Trim();
+                            string[] parts = value.Split('/');
+                            if(parts.Length == 2 && float.TryParse(parts[0], ComputingConstants.CultureInfo, out float num) && 
+                                                    float.TryParse(parts[1], ComputingConstants.CultureInfo, out float den))
+                                aspectRatio = num / den;
+                            else
+                                Console.WriteLine("Invalid aspect ratio value");
+                        }
                         //------------------------------------WindowHeight------------------------------------//
                         else if (line.StartsWith("WindowHeight:"))
                             windowHeight = Utils.ReadInt(in line, "WindowHeight:");
@@ -140,6 +149,7 @@ namespace PhysicsEngine
                     //Create a window with the name of ths schene without the extension
                     this.window = new RenderWindow(new VideoMode((uint)(windowHeight * aspectRatio), (uint)windowHeight), 
                                                     sceneName.Substring(0, sceneName.Length - 4));
+                    RenderWindowManager.window = window;
                     window.Closed += RenderWindowManager.OnWindowClosed;
                     window.Resized += RenderWindowManager.OnWindowResized;
 
@@ -199,8 +209,8 @@ namespace PhysicsEngine
                         float friction = PhysicsConstants.DefaultFriction;
                         bool isStatic = false;
 
-                        Vector2f position = new Vector2f(0, 0);
-                        float rotation = 0;
+                        StartPositions[i] = new Vector2f(0, 0);
+                        float rotation = 0;                    
 
                         while((line = sr.ReadLine()) != "End")
                         {
@@ -298,7 +308,7 @@ namespace PhysicsEngine
                             }
                             //------------------------------------Position------------------------------------//
                             else if(line.StartsWith("position:"))
-                                position = Utils.ReadVector2f(in line, "position:");
+                                StartPositions[i] = Utils.ReadVector2f(in line, "position:");
                             
                             //------------------------------------Rotation------------------------------------//
                             else if(line.StartsWith("rotation:"))
@@ -315,6 +325,7 @@ namespace PhysicsEngine
                                 color: color,
                                 mass: mass,
                                 velocity: velocity,
+                                rotation: rotation,
                                 acceleration: acceleration,
                                 angularVelocity: angularVelocity,
                                 angularAcceleration: angularAcceleration,
@@ -331,6 +342,7 @@ namespace PhysicsEngine
                                 color: color,
                                 mass: mass,
                                 velocity: velocity,
+                                rotation: rotation,
                                 acceleration: acceleration,
                                 angularVelocity: angularVelocity,
                                 angularAcceleration: angularAcceleration,
@@ -346,6 +358,7 @@ namespace PhysicsEngine
                                 window: window,
                                 color: color,
                                 mass: mass,
+                                rotation: rotation,
                                 velocity: velocity,
                                 acceleration: acceleration,
                                 angularVelocity: angularVelocity,
@@ -363,45 +376,44 @@ namespace PhysicsEngine
                     }
 
                     //Show all fields in console
-                    /* Console.WriteLine("Aspect Ratio: " + aspectRatio);
-                    // Console.WriteLine("Window Height: " + windowHeight);
-                    // Console.WriteLine("Pixels Per Meter: " + pixelsPerMeter);
-                    // Console.WriteLine("Gravity: " + gravityVector);
-                    // Console.WriteLine("Collision Manager: " + collisionManagerType);
-                    // Console.WriteLine("Collision Resolver: " + collisionResolver);
-                    // Console.WriteLine("Speed Factor: " + speedFactor);
-                    // Console.WriteLine("Substeps: " + substeps);
+                    /*Console.WriteLine("Aspect Ratio: " + aspectRatio);
+                    Console.WriteLine("Window Height: " + windowHeight);
+                    Console.WriteLine("Pixels Per Meter: " + pixelsPerMeter);
+                    Console.WriteLine("Gravity: " + gravityVector);
+                    Console.WriteLine("Collision Manager: " + collisionManagerType);
+                    Console.WriteLine("Collision Resolver: " + collisionResolver);
+                    Console.WriteLine("Speed Factor: " + speedFactor);
+                    Console.WriteLine("Substeps: " + substeps);
 
-                    // Console.WriteLine();
-                    // Console.WriteLine("Bodies: " + usedBodies);
-                    // for(int i = 0; i < usedBodies; i++)
-                    // {
-                    //     Console.WriteLine("Body " + i + ": ");
-                    //     Console.WriteLine("Type: " + Bodies[i].GetType());
+                    Console.WriteLine();
+                    Console.WriteLine("Bodies: " + usedBodies);
+                    for(int i = 0; i < usedBodies; i++)
+                    {
+                        Console.WriteLine("Body " + i + ": ");
+                        Console.WriteLine("Type: " + Bodies[i].GetType());
 
-                    //     if(Bodies[i] is CircleRigidBody circle)
-                    //         Console.WriteLine("Radius: " + circle.Radius);
+                        if(Bodies[i] is CircleRigidBody circle)
+                            Console.WriteLine("Radius: " + circle.Radius);
 
-                    //     else if(Bodies[i] is RectangleRigidBody rectangle)
-                    //         Console.WriteLine("Size: " + rectangle.Size);
+                        else if(Bodies[i] is RectangleRigidBody rectangle)
+                            Console.WriteLine("Size: " + rectangle.Size);
 
-                    //     else if(Bodies[i] is PolygonRigidBody polygon)
-                    //     {
-                    //         Console.WriteLine("Vertices: ");
-                    //         foreach(var vertex in polygon.Vertices)
-                    //             Console.WriteLine(vertex);
-                    //     }
-                    //     Console.WriteLine("Mass: " + Bodies[i].Mass);
-                    //     Console.WriteLine("Velocity: " + Bodies[i].Velocity);
-                    //     Console.WriteLine("Acceleration: " + Bodies[i].Acceleration);
-                    //     Console.WriteLine("Angular Velocity: " + Bodies[i].AngularVelocity);
-                    //     Console.WriteLine("Angular Acceleration: " + Bodies[i].AngularAcceleration);
-                    //     Console.WriteLine("Is Static: " + Bodies[i].IsStatic);
-                    // }*/
+                        else if(Bodies[i] is PolygonRigidBody polygon)
+                        {
+                            Console.WriteLine("Vertices: ");
+                            foreach(var vertex in polygon.Vertices)
+                                Console.WriteLine(vertex);
+                        }
+                        Console.WriteLine("Mass: " + Bodies[i].Mass);
+                        Console.WriteLine("Velocity: " + Bodies[i].Velocity);
+                        Console.WriteLine("Acceleration: " + Bodies[i].Acceleration);
+                        Console.WriteLine("Angular Velocity: " + Bodies[i].AngularVelocity);
+                        Console.WriteLine("Angular Acceleration: " + Bodies[i].AngularAcceleration);
+                        Console.WriteLine("Is Static: " + Bodies[i].IsStatic);
+                    }*/
 
                     //Create a collision manager
-                    if(collisionManagerType == "bvh")
-                        collisionManager = new CollisionManager(Bodies, usedBodies, discrete);
+                    collisionManager = new CollisionManager(Bodies, usedBodies, discrete);
 
 
                 }
@@ -415,10 +427,10 @@ namespace PhysicsEngine
         }
 
 
-
-
         public void Run()
         {
+            Console.WriteLine("Running simulation");
+            Console.WriteLine("Number of bodies: " + usedBodies);
             Start();
 
             // Create the clock
@@ -474,7 +486,8 @@ namespace PhysicsEngine
          */
         private void Start()
         {
-            throw new NotImplementedException();
+            for(int i = 0; i < usedBodies; i++)
+                Bodies[i].Start(StartPositions[i]);
         }
 
         /**
@@ -486,7 +499,10 @@ namespace PhysicsEngine
             for(int i = 0; i < usedBodies; i++)
                 Bodies[i].Update(deltaTime);
 
+                
+
             collisionManager.UpdateBVH(Bodies, usedBodiesCount: usedBodies);
+ 
 
             var potentialCollisions = collisionManager.GetPotentialCollisions();
 
@@ -499,6 +515,8 @@ namespace PhysicsEngine
                 float depth;
                 if (bodyA.Collider.Intersects(bodyB.Collider, out normal, out depth))
                 {
+                    if(collisionResolver == null)
+                        Console.WriteLine("Collision resolver is null");
                     if(collisionResolver.HandleOverlap(bodyA, bodyB, normal, depth))
                         continue;
                         

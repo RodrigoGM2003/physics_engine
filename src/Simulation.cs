@@ -1,6 +1,7 @@
 ﻿using SFML.Graphics;
 using SFML.Window;
 using SFML.System;
+using System.Runtime.CompilerServices;
 
 namespace PhysicsEngine
 {
@@ -73,183 +74,187 @@ namespace PhysicsEngine
          */
         static void Main(string[] args)
         {
-            // Create the window
-            window = new RenderWindow(new VideoMode(1000, 750), "SFML.NET Window");
-            // window.SetFramerateLimit(60);
-            RenderWindowManager.window = window;
-            window.Closed += RenderWindowManager.OnWindowClosed;
-            window.Resized += RenderWindowManager.OnWindowResized;
-
             var sim = new Simulator("scenes/scene1.scn");
+            sim.Run();
+            // uint width = 750;
+
+            // // Create the window
+            // // window = new RenderWindow(new VideoMode(width, (uint)(width / ComputingConstants.AspectRatio)), "SFML.NET Window");
+            // window = new RenderWindow(new VideoMode((uint)(width * ComputingConstants.AspectRatio), width), "SFML.NET Window");
+            // // window.SetFramerateLimit(60);
+            // RenderWindowManager.window = window;
+            // window.Closed += RenderWindowManager.OnWindowClosed;
+            // window.Resized += RenderWindowManager.OnWindowResized;
 
 
-            // Create the bodies
-            RigidBody[] Bodies = new RigidBody[2500];
-            // RigidBody[] Bodies = new RigidBody[2000];
 
-            Bodies[0] = new RectangleRigidBody(
-                size: new Vector2f(100, 20),
-                window: window, 
-                color: Color.Black, 
-                mass: 1f, 
-                velocity: new Vector2f(0, 0),
-                angularVelocity: 0f,
-                elasticity: 1f,
-                friction: 0f,
-                rotation: 0,
-                solid: false,
-                isStatic: true
-            );
-            Bodies[1] = new RectangleRigidBody(
-                size: new Vector2f(100, 20),
-                window: window, 
-                color: Color.Black, 
-                mass: 1f, 
-                velocity: new Vector2f(0, 0),
-                angularVelocity: 0f,
-                elasticity: 1f,
-                friction: 0f,
-                rotation: 0,
-                solid: false,
-                isStatic: true
-            );
-            Bodies[2] = new RectangleRigidBody(
-                size: new Vector2f(20, 75),
-                window: window, 
-                color: Color.Black, 
-                mass: 1f, 
-                velocity: new Vector2f(0, 0),
-                angularVelocity: 0f,
-                elasticity: 1f,
-                friction: 0f,
-                rotation: 0,
-                solid: false,
-                isStatic: true
-            );
-            Bodies[3] = new RectangleRigidBody(
-                size: new Vector2f(20, 75),
-                window: window, 
-                color: Color.Black, 
-                mass: 1f, 
-                velocity: new Vector2f(0, 0),
-                angularVelocity: 0f,
-                elasticity: 1f,
-                friction: 0f,
-                rotation: 0,
-                solid: false,
-                isStatic: true
-            );
-            // Bodies[4] = new RectangleRigidBody(
-            //     size: new Vector2f(5, 40),
-            //     window: window,
-            //     color: Color.Red, 
+            // // Create the bodies
+            // RigidBody[] Bodies = new RigidBody[2500];
+            // // RigidBody[] Bodies = new RigidBody[2000];
+
+            // Bodies[0] = new RectangleRigidBody(
+            //     size: new Vector2f(100, 20),
+            //     window: window, 
+            //     color: Color.Black, 
             //     mass: 1f, 
             //     velocity: new Vector2f(0, 0),
-            //     angularVelocity: MathF.PI,
+            //     angularVelocity: 0f,
             //     elasticity: 1f,
             //     friction: 0f,
-            //     rotation: 1,
+            //     rotation: 0,
             //     solid: false,
             //     isStatic: true
             // );
+            // Bodies[1] = new RectangleRigidBody(
+            //     size: new Vector2f(100, 20),
+            //     window: window, 
+            //     color: Color.Black, 
+            //     mass: 1f, 
+            //     velocity: new Vector2f(0, 0),
+            //     angularVelocity: 0f,
+            //     elasticity: 1f,
+            //     friction: 0f,
+            //     rotation: 0,
+            //     solid: false,
+            //     isStatic: true
+            // );
+            // Bodies[2] = new RectangleRigidBody(
+            //     size: new Vector2f(20, 75),
+            //     window: window, 
+            //     color: Color.Black, 
+            //     mass: 1f, 
+            //     velocity: new Vector2f(0, 0),
+            //     angularVelocity: 0f,
+            //     elasticity: 1f,
+            //     friction: 0f,
+            //     rotation: 0,
+            //     solid: false,
+            //     isStatic: true
+            // );
+            // Bodies[3] = new RectangleRigidBody(
+            //     size: new Vector2f(20, 75),
+            //     window: window, 
+            //     color: Color.Black, 
+            //     mass: 1f, 
+            //     velocity: new Vector2f(0, 0),
+            //     angularVelocity: 0f,
+            //     elasticity: 1f,
+            //     friction: 0f,
+            //     rotation: 0,
+            //     solid: false,
+            //     isStatic: true
+            // );
+            // // Bodies[4] = new RectangleRigidBody(
+            // //     size: new Vector2f(5, 40),
+            // //     window: window,
+            // //     color: Color.Red, 
+            // //     mass: 1f, 
+            // //     velocity: new Vector2f(0, 0),
+            // //     angularVelocity: MathF.PI,
+            // //     elasticity: 1f,
+            // //     friction: 0f,
+            // //     rotation: 1,
+            // //     solid: false,
+            // //     isStatic: true
+            // // );
             
-            usedBodies = 4;
-            collisionResolver = new DCD();
-            collisionManager = new CollisionManager(Bodies, usedBodies, discrete: collisionResolver.Discrete);
+            // usedBodies = 4;
+            // collisionResolver = new DCD();
+            // collisionManager = new CollisionManager(Bodies, usedBodies, discrete: collisionResolver.Discrete);
 
-            // Start the bodies
-            Start(ref Bodies);
+            // // Start the bodies
+            // Start(ref Bodies);
 
-            // Create the clock
-            clock = new Clock();
+            // // Create the clock
+            // clock = new Clock();
 
-            float substepTime = FrameTime / substeps;
-            // Main loop
-            while (window.IsOpen)
-            {
-                // Update the time
-                double deltaTime = clock.Restart().AsSeconds();
-                accumulatedTime += deltaTime;
+            // float substepTime = FrameTime / substeps;
+            // // Main loop
+            // while (window.IsOpen)
+            // {
+            //     // Update the time
+            //     double deltaTime = clock.Restart().AsSeconds();
+            //     accumulatedTime += deltaTime;
 
-                //--------------------------------------------------------------------------------
-                //Every .5 seconds add a new body
-                if(frames % 3 == 0 && usedBodies < 2000){
-                    Bodies[usedBodies] = new CircleRigidBody(
-                        // float random radius between 1 and 4
-                        radius: .3f,
-                        window: window,
-                        // Random color
-                        color: new Color((byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255)),
-                        mass: 1,
-                        // Random velocity between -20 and 20
-                        velocity: new Vector2f(-20, -20),
-                        // velocity: new Vector2f((float)new Random().Next(10, 30), (float)new Random().Next(10, 30)),
-                        angularVelocity: 0,
-                        elasticity: .7f,
-                        friction: 0.1f
-                    );
-                    Bodies[usedBodies].Start(new Vector2f(85f, 40f));
-                    usedBodies++;
-                }
-                //--------------------------------------------------------------------------------
+            //     //--------------------------------------------------------------------------------
+            //     //Every .5 seconds add a new body
+            //     if(frames % 15 == 0 && usedBodies < 200){
+            //         Bodies[usedBodies] = new CircleRigidBody(
+            //             // float random radius between 1 and 4
+            //             radius: 2f,
+            //             window: window,
+            //             // Random color
+            //             color: new Color((byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255)),
+            //             mass: 1,
+            //             // Random velocity between -20 and 20
+            //             velocity: new Vector2f(-20, -20),
+            //             // velocity: new Vector2f((float)new Random().Next(10, 30), (float)new Random().Next(10, 30)),
+            //             angularVelocity: 0,
+            //             elasticity: .7f,
+            //             friction: 0.1f
+            //         );
+            //         Bodies[usedBodies].Start(new Vector2f(85f, 40f));
+            //         usedBodies++;
+            //     }
+            //     //--------------------------------------------------------------------------------
 
-                // Update the scene
-                while (accumulatedTime >= FrameTime )
-                {   
-                    window.DispatchEvents();
+            //     // Update the scene
+            //     while (accumulatedTime >= FrameTime )
+            //     {   
+            //         window.DispatchEvents();
 
-                    for (int i = 0; i < substeps; i++)
-                        // Update(ref Bodies, substepTime * speedFactor);
-                        Update(ref Bodies, (float)substepTime * speedFactor);
+            //         for (int i = 0; i < substeps; i++)
+            //             // Update(ref Bodies, substepTime * speedFactor);
+            //             Update(ref Bodies, (float)substepTime * speedFactor);
 
-                    accumulatedTime -= FrameTime;
-                }
+            //         accumulatedTime -= FrameTime;
+            //     }
 
-                // Clear the window
-                window.Clear(Color.Black);
+            //     // Clear the window
+            //     window.Clear(Color.Black);
 
-                // Draw the scene
-                Draw(ref Bodies);
-                frames++;
-                window.Display();
+            //     // Draw the scene
+            //     Draw(ref Bodies);
+            //     frames++;
+            //     window.Display();
 
-                // Sleep if the frame time is too fast
-                double elapsed = clock.ElapsedTime.AsSeconds();
-                if (elapsed > FrameTime)
-                    accumulatedTime += FrameTime;
-                else
-                    accumulatedTime += elapsed;
+            //     // Sleep if the frame time is too fast
+            //     double elapsed = clock.ElapsedTime.AsSeconds();
+            //     if (elapsed > FrameTime)
+            //         accumulatedTime += FrameTime;
+            //     else
+            //         accumulatedTime += elapsed;
                 
-                clock.Restart();
+            //     clock.Restart();
 
-                if(frames % ComputingConstants.FrameRate == 0){
-                    Console.WriteLine("----------------------------------------------");
-                    Console.WriteLine("Frames: " + frames);
-                    Console.WriteLine("Sim FPS: " + 1.0f / elapsed);
-                    Console.WriteLine("DeltaTime: " + deltaTime);
-                    Console.WriteLine("Elapsed: " + elapsed * 1000 + "ms");
-                    Console.WriteLine("Spare Time: " + (FrameTime - elapsed) * 1000 + "ms");
+            //     // if(frames % ComputingConstants.FrameRate == 0){
+            //     //     Console.WriteLine("----------------------------------------------");
+            //     //     Console.WriteLine("Frames: " + frames);
+            //     //     Console.WriteLine("Sim FPS: " + 1.0f / elapsed);
+            //     //     Console.WriteLine("DeltaTime: " + deltaTime);
+            //     //     Console.WriteLine("Elapsed: " + elapsed * 1000 + "ms");
+            //     //     Console.WriteLine("Spare Time: " + (FrameTime - elapsed) * 1000 + "ms");
 
-                }
-                while (elapsed < FrameTime)
-                    elapsed = clock.ElapsedTime.AsSeconds();
+            //     // }
+            //     while (elapsed < FrameTime)
+            //         elapsed = clock.ElapsedTime.AsSeconds();
 
 
-                if(frames % ComputingConstants.FrameRate == 0)
-                {
-                    Console.WriteLine("Time elapsed after sleep: " + elapsed * 1000 + "ms");
-                    Console.WriteLine("Number of bodies: " + usedBodies);
-                    Console.WriteLine("True FPS: " + 1.0f / elapsed);
-                    Console.WriteLine("----------------------------------------------");
-                }
+            //     if(frames % ComputingConstants.FrameRate == 0)
+            //     {
+            //     //     Console.WriteLine("Time elapsed after sleep: " + elapsed * 1000 + "ms");
+            //     //     Console.WriteLine("Number of bodies: " + usedBodies);
+            //         Console.WriteLine("True FPS: " + 1.0f / elapsed);
+            //     //     Console.WriteLine("----------------------------------------------");
+            //     }
 
-                // if(1.0f / elapsed < ComputingConstants.FrameRate - 1){
-                //     speedFactor = ComputingConstants.FrameRate / (float)(1.0f / elapsed);
-                //     // Console.WriteLine("FPS is too low");
-                // }
-                // else
-                //     speedFactor = 1f;
-            }
+            //     // if(1.0f / elapsed < ComputingConstants.FrameRate - 1){
+            //     //     speedFactor = ComputingConstants.FrameRate / (float)(1.0f / elapsed);
+            //     //     // Console.WriteLine("FPS is too low");
+            //     // }
+            //     // else
+            //     //     speedFactor = 1f;
+            //}
 
         }
 

@@ -1,28 +1,43 @@
 SCN
 #Settings
-AspectRatio: 2.0
-WindowHeight: 500
+AspectRatio: 16/9
+WindowHeight: 750
 PixelPerMeter: 10.0
 Gravity: 0, 9.81
 CollisionManager: BVH
-CollisionResolver: DCD
+CollisionResolver: dcd
 SpeedFactor: 1.0
 Substeps: 4
 #EndSettings
 #SceneDefinition
-BodyCount: 1
+BodyCount: 2
     type: circle
     radius: 3.0
     color: Red
     mass: 1.2
-    velocity: 1.0, 0
+    velocity: 10.0, 0
     acceleration: 0, 1.0
     angularVelocity: 3
     angularAcceleration: 14
-    elasticity: 0.1
+    elasticity: 1
     friction: 0.1
     solid: true
-    isStatic: true
-    position: 1.1, 20.3
-    rotation: 1
+    isStatic: false
+    position: 20.3, 20.3
+    rotation: 0
+End
+    type: circle
+    radius: 3.0
+    color: Red
+    mass: 1.2
+    velocity: -10.0, 0
+    acceleration: 0, 1.0
+    angularVelocity: 3
+    angularAcceleration: 14
+    elasticity: 1
+    friction: 0.1
+    solid: true
+    isStatic: false
+    position: 40.3, 20.3
+    rotation: 0
 End

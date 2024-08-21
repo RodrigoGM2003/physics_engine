@@ -117,8 +117,6 @@ namespace PhysicsEngine
             Acceleration = new Vector2f(0, 0);
             if (!IsStatic)
             {
-
-
                 // Apply gravity if the object has mass
                 ApplyAcceleration(PhysicsConstants.GravityVector);
             }

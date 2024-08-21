@@ -59,7 +59,7 @@ namespace PhysicsEngine
          */
         public void UpdateBVH(RigidBody[] bodies, int usedBodiesCount)
         {
-            root = BuildBVH(bodies, 0, usedBodiesCount, 0);
+            root = BuildBVH(bodies, 0, usedBodiesCount, depth: 0);
         }
 
         /**
