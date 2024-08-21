@@ -3,6 +3,7 @@ using SFML.Window;
 using SFML.Graphics;
 using SFML.System;
 using System.Globalization;
+using System.Diagnostics;
 
 
 namespace PhysicsEngine
@@ -26,6 +27,12 @@ namespace PhysicsEngine
         public int substeps { get; set; } = 8; // The number of substeps to take per frame
         private double accumulatedTime { get; set; } = 0; // The time that has accumulated since the last frame
 
+        private Stopwatch stopwatch = new Stopwatch();
+        private double accumulatedTimeUpdate = 0;
+        private double accumulatedTimeUpdateBVH = 0;
+        private double accumulatedTimeGetPotentialCollisions = 0;
+        private double accumulatedTimeCollisionLoop = 0;
+
         /**
         * Base constructor for the Simulator class
         * @param window The window to draw to
@@ -47,6 +54,215 @@ namespace PhysicsEngine
             this.speedFactor = speedFactor;
             this.substeps = substeps;
         }
+ 
+
+        /**
+        * Run the simulation
+        * @param Bodies The array of bodies in the scene
+        */
+        public void Run()
+        {
+
+            Console.WriteLine("Running simulation");
+            Console.WriteLine("Number of bodies: " + usedBodies);
+            Console.WriteLine("Substeps: " + substeps);
+            Start();
+
+            // Create the clock
+            var clock = new Clock();
+            float frameTime = 1 / ComputingConstants.FrameRate;
+            float substepTime = 1 / (substeps * ComputingConstants.FrameRate);
+            int frames = 0;
+
+            Stopwatch sw = new Stopwatch();
+
+
+            // Main loop
+            while (window.IsOpen)
+            {
+                frames++;
+                // Update the time
+                float deltaTime = clock.Restart().AsSeconds();
+                accumulatedTime += deltaTime;
+
+                if(frames % 3 == 0 && usedBodies < 400)
+                {
+                    var body =  new CircleRigidBody(
+                        // float random radius between 1 and 4
+                        radius: 1f,
+                        window: window,
+                        // Random color
+                        color: new Color((byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255)),
+                        mass: 1,
+                        // Random velocity between -20 and 20
+                        velocity: new Vector2f((float).1, (float)-60.0),
+                        // velocity: new Vector2f((float)new Random().Next(10, 30), (float)new Random().Next(10, 30)),
+                        angularVelocity: 0,
+                        elasticity: .1f,
+                        friction: 0.1f
+                    );
+                    AddBody(body, new Vector2f(50, 30));
+                }
+
+                // Update the scene
+                while (accumulatedTime >= frameTime )
+                {
+                    window.DispatchEvents();
+
+                    for (int i = 0; i < substeps; i++)
+                        Update(substepTime * speedFactor);
+
+                    accumulatedTime -= frameTime;
+                }
+
+
+                // Clear the window
+                window.Clear(Color.Black);
+
+                // Draw the scene
+                Draw();
+                window.Display();
+
+                //If framerate is too low, add a delay to keep the framerate constant
+                double elapsed = clock.ElapsedTime.AsSeconds();
+                if (elapsed > frameTime)
+                    accumulatedTime += frameTime;
+                else
+                    accumulatedTime += elapsed;
+                
+                clock.Restart();
+
+                // Sleep if the frame time is too fast
+                while (elapsed < frameTime)
+                    elapsed = clock.ElapsedTime.AsSeconds();
+
+                if(frames % ComputingConstants.FrameRate/2 == 0)
+                    Console.WriteLine("True FPS: " + Math.Round(1.0f / elapsed), 0);
+                    // Console.WriteLine("True FPS: " + 1.0f / elapsed);
+            }
+
+            accumulatedTimeUpdate /= frames;
+            accumulatedTimeUpdateBVH /= frames;
+            accumulatedTimeGetPotentialCollisions /= frames;
+            accumulatedTimeCollisionLoop /= frames;
+
+            Console.WriteLine("UpdateTime: " + accumulatedTimeUpdate);
+            Console.WriteLine("UpdateBVHTime: " + accumulatedTimeUpdateBVH);
+            Console.WriteLine("GetPotentialCollisionsTime: " + accumulatedTimeGetPotentialCollisions);
+            Console.WriteLine("CollisionLoopTime: " + accumulatedTimeCollisionLoop);
+
+        }
+
+        /**
+        * Start all the bodies in the scene
+        * @param Bodies The array of bodies in the scene
+        */
+        private void Start()
+        {
+            for(int i = 0; i < usedBodies; i++)
+                Bodies[i].Start(StartPositions[i]);
+        }
+
+        /**
+        * Update all the bodies in the scene
+        * @param Bodies The array of bodies in the scene
+        */
+        private void Update(float deltaTime)
+        {
+            stopwatch.Restart();
+            stopwatch.Start();
+
+            for(int i = 0; i < usedBodies; i++)
+                // Task.Run(() => Bodies[i].Update(deltaTime));
+                Bodies[i].Update(deltaTime);
+
+            // Task.WaitAll();
+
+            stopwatch.Stop();
+            accumulatedTimeUpdate += stopwatch.Elapsed.TotalMilliseconds;
+                
+
+            stopwatch.Restart();
+            stopwatch.Start();
+            collisionManager.UpdateBVH(Bodies, usedBodiesCount: usedBodies);
+            stopwatch.Stop();
+            accumulatedTimeUpdateBVH += stopwatch.Elapsed.TotalMilliseconds;
+
+            stopwatch.Restart();
+            stopwatch.Start();
+            var potentialCollisions = collisionManager.GetPotentialCollisions();
+            stopwatch.Stop();
+            accumulatedTimeGetPotentialCollisions += stopwatch.Elapsed.TotalMilliseconds;
+
+
+            stopwatch.Restart();
+            stopwatch.Start();
+            foreach (var (bodyA, bodyB) in potentialCollisions){
+
+                if(bodyA.IsStatic && bodyB.IsStatic)
+                    continue;
+
+                Vector2f normal;
+                float depth;
+                if (bodyA.Collider.Intersects(bodyB.Collider, out normal, out depth))
+                {
+                    if(collisionResolver.HandleOverlap(bodyA, bodyB, normal, depth))
+                        continue;
+                        
+                    collisionResolver.ResolveCollision(bodyA, bodyB, normal, depth);
+                }
+                
+            }
+            stopwatch.Stop();
+            accumulatedTimeCollisionLoop += stopwatch.Elapsed.TotalMilliseconds;
+        }
+
+        /**
+        * Add a body to the scene
+        * @param body The body to add to the scene
+        * @param Bodies The array of bodies in the scene
+        */
+        public void AddBody(RigidBody body, Vector2f position)
+        {
+            if(usedBodies >= Bodies.Length)
+                IncrementCapacity();
+            
+
+            Bodies[usedBodies] = body;
+            StartPositions[usedBodies] = position;
+            Bodies[usedBodies].Start(StartPositions[usedBodies]);
+
+            usedBodies++;
+        }
+        /**
+        * Increment the capacity of the bodies array
+        * @param Bodies The array of bodies in the scene
+        */
+        private void IncrementCapacity(){
+            RigidBody[] newBodies = new RigidBody[Bodies.Length * 2];
+            Bodies.CopyTo(newBodies, 0);
+            Bodies = newBodies;
+        }
+
+        /**
+        * Draw all the bodies in the scene
+        * @param Bodies The array of bodies in the scene
+        */
+        private void Draw()
+        {
+            for(int i = 0; i < usedBodies; i++)
+                Bodies[i].Draw();
+            
+
+
+            // collisionManager.root.Draw();
+        }
+
+        //------------------------------------Main Constructor------------------------------------//
+        /**
+        * Read a scene from a file
+        * @param sceneName The name of the scene file
+        */
         public Simulator(in string sceneName)
         {
             // Assuming your file uses the dot as the decimal separator:
@@ -71,9 +287,9 @@ namespace PhysicsEngine
                     Vector2f gravityVector = PhysicsConstants.GravityVector;
                     string collisionManagerType = "classic";
                     bool discrete = true;
-                    this.collisionResolver = new DCD();
-                    float speedFactor = PhysicsConstants.DefaultSpeedFactor;
-                    int substeps = ComputingConstants.DefaultSubsteps;
+                    collisionResolver = new DCD();
+                    speedFactor = PhysicsConstants.DefaultSpeedFactor;
+                    substeps = ComputingConstants.DefaultSubsteps;
 
                     
                     if((line = sr.ReadLine()) != "#Settings")
@@ -208,6 +424,7 @@ namespace PhysicsEngine
                         float elasticity = PhysicsConstants.DefaultElasticity;
                         float friction = PhysicsConstants.DefaultFriction;
                         bool isStatic = false;
+                        bool solid = true;
 
                         StartPositions[i] = new Vector2f(0, 0);
                         float rotation = 0;                    
@@ -306,6 +523,12 @@ namespace PhysicsEngine
                                 value = line.Substring("isStatic:".Length).Trim();
                                 isStatic = bool.Parse(value);
                             }
+                            else if(line.StartsWith("solid:"))
+                            {
+                                // Extract the bool value after "isStatic:"
+                                value = line.Substring("solid:".Length).Trim();
+                                solid = bool.Parse(value);
+                            }
                             //------------------------------------Position------------------------------------//
                             else if(line.StartsWith("position:"))
                                 StartPositions[i] = Utils.ReadVector2f(in line, "position:");
@@ -331,7 +554,8 @@ namespace PhysicsEngine
                                 angularAcceleration: angularAcceleration,
                                 elasticity: elasticity,
                                 friction: friction,
-                                isStatic: isStatic
+                                isStatic: isStatic,                                
+                                solid: solid
                             );
                         }
                         else if(bodyType == "rectangle")
@@ -348,7 +572,8 @@ namespace PhysicsEngine
                                 angularAcceleration: angularAcceleration,
                                 elasticity: elasticity,
                                 friction: friction,
-                                isStatic: isStatic
+                                isStatic: isStatic,
+                                solid: solid
                             );
                         }
                         else if(bodyType == "polygon")
@@ -365,7 +590,8 @@ namespace PhysicsEngine
                                 angularAcceleration: angularAcceleration,
                                 elasticity: elasticity,
                                 friction: friction,
-                                isStatic: isStatic
+                                isStatic: isStatic,
+                                solid: solid
                             );
                         }
                         else
@@ -424,120 +650,6 @@ namespace PhysicsEngine
                 Console.WriteLine(e.Message);
                 return;
             }
-        }
-
-
-        public void Run()
-        {
-            Console.WriteLine("Running simulation");
-            Console.WriteLine("Number of bodies: " + usedBodies);
-            Start();
-
-            // Create the clock
-            var clock = new Clock();
-            float frameTime = 1 / ComputingConstants.FrameRate;
-            float substepTime = 1 / (substeps * ComputingConstants.FrameRate);
-            
-            // Main loop
-            while (window.IsOpen)
-            {
-                // Update the time
-                float deltaTime = clock.Restart().AsSeconds();
-                accumulatedTime += deltaTime;
-
-
-                // Update the scene
-                while (accumulatedTime >= frameTime )
-                {
-                    window.DispatchEvents();
-
-                    for (int i = 0; i < substeps; i++)
-                        Update(substepTime * speedFactor);
-
-                    accumulatedTime -= frameTime;
-                }
-
-                // Clear the window
-                window.Clear(Color.Black);
-
-                // Draw the scene
-                Draw();
-                window.Display();
-
-                //If framerate is too low, add a delay to keep the framerate constant
-                double elapsed = clock.ElapsedTime.AsSeconds();
-                if (elapsed > frameTime)
-                    accumulatedTime += frameTime;
-                else
-                    accumulatedTime += elapsed;
-                
-                clock.Restart();
-
-                // Sleep if the frame time is too fast
-                while (elapsed < frameTime)
-                    elapsed = clock.ElapsedTime.AsSeconds();
-            }
-
-        }
-
-        /**
-         * Start all the bodies in the scene
-         * @param Bodies The array of bodies in the scene
-         */
-        private void Start()
-        {
-            for(int i = 0; i < usedBodies; i++)
-                Bodies[i].Start(StartPositions[i]);
-        }
-
-        /**
-         * Update all the bodies in the scene
-         * @param Bodies The array of bodies in the scene
-         */
-        private void Update(float deltaTime)
-        {
-            for(int i = 0; i < usedBodies; i++)
-                Bodies[i].Update(deltaTime);
-
-                
-
-            collisionManager.UpdateBVH(Bodies, usedBodiesCount: usedBodies);
- 
-
-            var potentialCollisions = collisionManager.GetPotentialCollisions();
-
-            foreach (var (bodyA, bodyB) in potentialCollisions){
-
-                if(bodyA.IsStatic && bodyB.IsStatic)
-                    continue;
-
-                Vector2f normal;
-                float depth;
-                if (bodyA.Collider.Intersects(bodyB.Collider, out normal, out depth))
-                {
-                    if(collisionResolver == null)
-                        Console.WriteLine("Collision resolver is null");
-                    if(collisionResolver.HandleOverlap(bodyA, bodyB, normal, depth))
-                        continue;
-                        
-                    collisionResolver.ResolveCollision(bodyA, bodyB, normal, depth);
-                }
-                
-            }
-        }
-
-        /**
-         * Draw all the bodies in the scene
-         * @param Bodies The array of bodies in the scene
-         */
-        private void Draw()
-        {
-            for(int i = 0; i < usedBodies; i++)
-                Bodies[i].Draw();
-            
-
-
-            // collisionManager.root.Draw();
         }
     }
 }

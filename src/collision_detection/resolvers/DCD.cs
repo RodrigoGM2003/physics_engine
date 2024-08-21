@@ -80,25 +80,47 @@ namespace PhysicsEngine
 
             float restitution = Math.Min(bodyA.Collider.Elasticity, bodyB.Collider.Elasticity);
 
-            float j = -(1f + restitution) * relativeVelocity.Dot(normal);;
+            float j = -(1f + restitution) * relativeVelocity.Dot(normal);
 
-            if(bodyA.IsStatic)
-            {
-                j /= 1f / bodyB.Mass;
-                bodyB.ApplyImpulse(-j * normal);
-            }
-            else if(bodyB.IsStatic)
-            {
-                j /= 1f / bodyA.Mass;
+            //30fps
+            j /= bodyA.InverseMass + bodyB.InverseMass;
+            if (!bodyA.IsStatic)
                 bodyA.ApplyImpulse(j * normal);
-            }
-            else
-            {
-                j /= (1f / bodyA.Mass) + (1f / bodyB.Mass);
+            
+            if (!bodyB.IsStatic)
+                bodyB.ApplyImpulse(-j * normal);
 
-                bodyA.ApplyImpulse(j * normal);
-                bodyB.ApplyImpulse(-j * normal);
-            }
+
+            //30fps
+            //j /= bodyA.InverseMass + bodyB.InverseMass;
+            // if(bodyA.IsStatic)
+            //     bodyB.ApplyImpulse(-j * normal);
+            // else if(bodyB.IsStatic)
+            //     bodyA.ApplyImpulse(j * normal);
+            // else
+            // {
+            //     bodyA.ApplyImpulse(j * normal);
+            //     bodyB.ApplyImpulse(-j * normal);
+            // }
+
+            //30fps
+            // if(bodyA.IsStatic)
+            // {
+            //     j /= 1f / bodyB.Mass;
+            //     bodyB.ApplyImpulse(-j * normal);
+            // }
+            // else if(bodyB.IsStatic)
+            // {
+            //     j /= 1f / bodyA.Mass;
+            //     bodyA.ApplyImpulse(j * normal);
+            // }
+            // else
+            // {
+            //     j /= (1f / bodyA.Mass) + (1f / bodyB.Mass);
+
+            //     bodyA.ApplyImpulse(j * normal);
+            //     bodyB.ApplyImpulse(-j * normal);
+            // }
         }
     }
 }

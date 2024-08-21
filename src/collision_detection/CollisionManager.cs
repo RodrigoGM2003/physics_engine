@@ -44,6 +44,7 @@ namespace PhysicsEngine
             // Split the bodies into two halves
             int medianIndex = startIndex + usedBodiesCount / 2;
 
+            //6.3ms
             // Build the left and right nodes using indices to avoid creating new arrays
             var leftNode = BuildBVH(bodies, startIndex, medianIndex, depth + 1);
             var rightNode = BuildBVH(bodies, medianIndex, endIndex, depth + 1);
