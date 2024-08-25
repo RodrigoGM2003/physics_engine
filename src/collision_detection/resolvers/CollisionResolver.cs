@@ -22,7 +22,7 @@ namespace PhysicsEngine
         * @param depth The depth of the collision
         * @return Whether the overlap was handled
         */
-        public abstract bool HandleOverlap(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth);
+        public abstract bool HandleOverlap(Body bodyA, Body bodyB, in Vector2f normal, in float depth);
 
         /**
         * Method to resolve a collision between two rigid bodies
@@ -31,7 +31,7 @@ namespace PhysicsEngine
         * @param normal The normal of the collision
         * @param depth The depth of the collision
         */
-        public abstract void ResolveCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth);  
+        public abstract void ResolveCollision(Body bodyA, Body bodyB, in Vector2f normal, in float depth);  
 
 
 

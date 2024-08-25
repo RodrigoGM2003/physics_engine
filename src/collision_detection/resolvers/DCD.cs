@@ -24,7 +24,17 @@ namespace PhysicsEngine
         * - If one of the bodies is static, move the other body out of the collision
         * - If both bodies are dynamic, move them both out of the collision
         */
-        public override bool HandleOverlap(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth)
+        public override bool HandleOverlap(Body bodyA, Body bodyB, in Vector2f normal, in float depth)
+        {
+            // Type check to ensure the method only works with RigidBody
+            if (bodyA is RigidBody rigidBodyA && bodyB is RigidBody rigidBodyB)
+                return HandleOverlap(rigidBodyA, rigidBodyB, normal, depth);
+            
+            else
+                throw new ArgumentException("DCD.HandleOverlap only supports RigidBody instances.");
+            
+        }
+        public  bool HandleOverlap(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth)
         {
             Vector2f aToB = bodyB.Position - bodyA.Position;
             Vector2f bToA = bodyA.Position - bodyB.Position;
@@ -74,7 +84,17 @@ namespace PhysicsEngine
         * - If one of the bodies is static, apply an impulse to the other body
         * - If both bodies are dynamic, apply impulses to both bodies
         */
-        public override void ResolveCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth)
+        public override void ResolveCollision(Body bodyA, Body bodyB, in Vector2f normal, in float depth)
+        {
+            // Type check to ensure the method only works with RigidBody
+            if (bodyA is RigidBody rigidBodyA && bodyB is RigidBody rigidBodyB)
+                ResolveCollision(rigidBodyA, rigidBodyB, normal, depth);
+            
+            else
+                throw new ArgumentException("DCD.ResolveCollision only supports RigidBody instances.");
+            
+        }
+        public  void ResolveCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth)
         {
             Vector2f relativeVelocity = bodyA.Velocity - bodyB.Velocity;
 

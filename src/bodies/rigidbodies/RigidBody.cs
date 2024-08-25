@@ -9,7 +9,7 @@ namespace PhysicsEngine
     /**
      * Class for all physic bodies in the simulation
      */
-    public class RigidBody //: Body
+    public class RigidBody : Body
     {
         private float _mass; // Mass in kg
         private float _inverseMass; // Inverse mass in kg^-1
@@ -17,13 +17,13 @@ namespace PhysicsEngine
         private Vector2f _position; // Position in m
         private float _rotation; // Rotation in grads
 
-        public Collider Collider { get; protected set; } // Collider for the object
-        public Drawer RBDrawer { get; protected set; }
+        // public Collider Collider { get; protected set; } // Collider for the object
+        // public Drawer Drawer { get; protected set; }
         public Vector2f Velocity { get; set; } // Velocity in m/s
         public Vector2f Acceleration { get; set; } // Acceleration in m/s^2
         public float AngularVelocity { get; set; } // Angular velocity in rads/s
         public float AngularAcceleration { get; set; } // Angular acceleration in rads/s^2
-        public Vector2f Position // Property for the position of the object
+        public override Vector2f Position // Property for the position of the object
         {
             get => _position;
             set
@@ -54,7 +54,7 @@ namespace PhysicsEngine
             }
         }
         public float InverseMass => _inverseMass; // Property for the inverse mass of the object
-        public bool IsStatic // Property for the staticness of the object
+        public override bool IsStatic // Property for the staticness of the object
         {
             get => _isStatic;
             set
@@ -79,7 +79,7 @@ namespace PhysicsEngine
                         float? angularAcceleration = null, bool isStatic = false)
         {
             Collider = collider;
-            RBDrawer = drawer;
+            Drawer = drawer;
 
             Position = new Vector2f(0, 0);
             Rotation = rotation ?? 0;
@@ -98,7 +98,7 @@ namespace PhysicsEngine
         * Start method for the RigidBody class
         * @param position The position of the object in the scene at start
         */
-        public void Start(Vector2f position)
+        public override void Start(Vector2f position)
         {
             Position = position;
         }
@@ -107,7 +107,7 @@ namespace PhysicsEngine
         * Update the state of the RigidBody
         * @param dt The change in time since the last frame
         */
-        public void Update(in float deltaTime)
+        public override void Update(in float deltaTime)
         {
             Velocity += Acceleration * deltaTime;
             Position += Velocity * deltaTime;
@@ -131,9 +131,9 @@ namespace PhysicsEngine
         *
         * Note: The position of the object is in meters, so we need to convert it to pixels
         */
-        public void Draw()
+        public override void Draw()
         {   
-            RBDrawer.Draw(Position, Rotation);
+            Drawer.Draw(Position, Rotation);
 
             // RectangleShape shape = new RectangleShape(Collider.SweptAABB.Size * PhysicsConstants.PixelsPerMeter);
             // shape.Position = new Vector2f(Collider.SweptAABB.Left * PhysicsConstants.PixelsPerMeter, Collider.SweptAABB.Top * PhysicsConstants.PixelsPerMeter);

@@ -13,12 +13,12 @@ namespace PhysicsEngine
     {
         public override bool Discrete => false; // Continuous collision detection is enabled
 
-        public override void ResolveCollision(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth)
+        public override void ResolveCollision(Body bodyA, Body bodyB, in Vector2f normal, in float depth)
         {
             throw new NotImplementedException();
         }
 
-        public override bool HandleOverlap(RigidBody bodyA, RigidBody bodyB, in Vector2f normal, in float depth)
+        public override bool HandleOverlap(Body bodyA, Body bodyB, in Vector2f normal, in float depth)
         {
             throw new NotImplementedException();
         }

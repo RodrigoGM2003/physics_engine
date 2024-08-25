@@ -13,7 +13,8 @@ namespace PhysicsEngine
         public static readonly int MaxSubsteps = 128; // The maximum number of substeps to take per frame
         public static readonly int MinSubsteps = 1; // The minimum number of substeps to take per frame
 
-        public RigidBody[] Bodies { get; set; } = new RigidBody[1000]; // The array of bodies in the scene
+        // public Body[] Bodies { get; set; } = new Body[1000]; // The array of bodies in the scene
+        public Body[] Bodies { get; set; } = new Body[1000]; // The array of bodies in the scene
         public Vector2f[] StartPositions { get; set; } = new Vector2f[1000]; // The start conditions of the bodies in the scene
         public int usedBodies { get; set; } = 0; // The number of bodies in the scene
         // public /*required*/ LogicObject[] Objects { get; set; } = new LogicObject[1000]; // The array of objects in the scene
@@ -150,7 +151,6 @@ namespace PhysicsEngine
             Console.WriteLine("UpdateBVHTime: " + accumulatedTimeUpdateBVH);
             Console.WriteLine("GetPotentialCollisionsTime: " + accumulatedTimeGetPotentialCollisions);
             Console.WriteLine("CollisionLoopTime: " + accumulatedTimeCollisionLoop);
-
         }
 
         /**
@@ -222,7 +222,7 @@ namespace PhysicsEngine
         * @param body The body to add to the scene
         * @param Bodies The array of bodies in the scene
         */
-        public void AddBody(RigidBody body, Vector2f position)
+        public void AddBody(Body body, Vector2f position)
         {
             if(usedBodies >= Bodies.Length)
                 IncrementCapacity();
@@ -239,7 +239,7 @@ namespace PhysicsEngine
         * @param Bodies The array of bodies in the scene
         */
         private void IncrementCapacity(){
-            RigidBody[] newBodies = new RigidBody[Bodies.Length * 2];
+            Body[] newBodies = new Body[Bodies.Length * 2];
             Bodies.CopyTo(newBodies, 0);
             Bodies = newBodies;
         }
@@ -343,10 +343,8 @@ namespace PhysicsEngine
                                 collisionResolver = new DCD();
                             else if(value == "ccd")
                                 collisionResolver = new CCD();
-
-                            //TODO: Implement Verlet collision resolver
-                            // else if(value == "VERLET")
-                                // collisionResolver = new Verlet();
+                            else if(value == "verlet")
+                                collisionResolver = new Verlet();
 
                             else
                                 Console.WriteLine("Invalid collision resolver value");

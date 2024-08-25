@@ -15,7 +15,7 @@ namespace PhysicsEngine
          * Constructor for the CollisionManager2 class
          * @param bodies The bodies in the scene
          */
-        public CollisionManager(RigidBody[] bodies, int usedBodiesCount, bool discrete)
+        public CollisionManager(Body[] bodies, int usedBodiesCount, bool discrete)
         {
             Discrete = discrete;
             root = BuildBVH(bodies, 0, usedBodiesCount, 0);
@@ -26,7 +26,7 @@ namespace PhysicsEngine
          * @param bodies The bodies in the scene
          * @param depth The depth of the node in the hierarchy
          */
-        private BVHNode BuildBVH(RigidBody[] bodies, int startIndex, int endIndex, int depth)
+        private BVHNode BuildBVH(Body[] bodies, int startIndex, int endIndex, int depth)
         {
             int usedBodiesCount = endIndex - startIndex;
 
@@ -37,9 +37,9 @@ namespace PhysicsEngine
             // Sort the bodies based on the axis
             int axis = depth % 2;
             if (axis == 0)
-                Array.Sort(bodies, startIndex, usedBodiesCount, Comparer<RigidBody>.Create((b1, b2) => b1.Position.X.CompareTo(b2.Position.X)));
+                Array.Sort(bodies, startIndex, usedBodiesCount, Comparer<Body>.Create((b1, b2) => b1.Position.X.CompareTo(b2.Position.X)));
             else
-                Array.Sort(bodies, startIndex, usedBodiesCount, Comparer<RigidBody>.Create((b1, b2) => b1.Position.Y.CompareTo(b2.Position.Y)));
+                Array.Sort(bodies, startIndex, usedBodiesCount, Comparer<Body>.Create((b1, b2) => b1.Position.Y.CompareTo(b2.Position.Y)));
 
             // Split the bodies into two halves
             int medianIndex = startIndex + usedBodiesCount / 2;
@@ -58,7 +58,7 @@ namespace PhysicsEngine
          * Update the bounding volume hierarchy
          * @param bodies The bodies in the scene
          */
-        public void UpdateBVH(RigidBody[] bodies, int usedBodiesCount)
+        public void UpdateBVH(Body[] bodies, int usedBodiesCount)
         {
             root = BuildBVH(bodies, 0, usedBodiesCount, depth: 0);
         }
@@ -66,9 +66,9 @@ namespace PhysicsEngine
         /**
          * Get the potential collisions in the scene
          */
-        public List<(RigidBody, RigidBody)> GetPotentialCollisions()
+        public List<(Body, Body)> GetPotentialCollisions()
         {
-            var potentialCollisions = new List<(RigidBody, RigidBody)>();
+            var potentialCollisions = new List<(Body, Body)>();
             TraverseBVH(root, potentialCollisions);
             return potentialCollisions;
         }
@@ -81,7 +81,7 @@ namespace PhysicsEngine
          *
          * Here is where all the magic happens. We traverse the BVH and check for potential collisions between the bodies.
          */
-        private void TraverseBVH(BVHNode node, List<(RigidBody, RigidBody)> potentialCollisions)
+        private void TraverseBVH(BVHNode node, List<(Body, Body)> potentialCollisions)
         {
             // If the node is a leaf, return
             if (node.IsLeaf)
@@ -102,7 +102,7 @@ namespace PhysicsEngine
          * @param rightNode The right node
          * @param potentialCollisions The list of potential collisions
          */
-        private void CheckPotentialCollisions(BVHNode leftNode, BVHNode rightNode, List<(RigidBody, RigidBody)> potentialCollisions)
+        private void CheckPotentialCollisions(BVHNode leftNode, BVHNode rightNode, List<(Body, Body)> potentialCollisions)
         {
             // If the bounding boxes of the nodes intersect, check for potential collisions
             if (leftNode.BoundingBox.Intersects(rightNode.BoundingBox))
