@@ -86,23 +86,41 @@ namespace PhysicsEngine
                 float deltaTime = clock.Restart().AsSeconds();
                 accumulatedTime += deltaTime;
 
-                if(frames % 3 == 0 && usedBodies < 400)
+                // if(frames % 3 == 0 && usedBodies < 400)
+                // {
+                //     var body =  new CircleRigidBody(
+                //         // float random radius between 1 and 4
+                //         radius: 1f,
+                //         window: window,
+                //         // Random color
+                //         color: new Color((byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255)),
+                //         mass: 1,
+                //         // Random velocity between -20 and 20
+                //         velocity: new Vector2f((float).1, (float)-60.0),
+                //         // velocity: new Vector2f((float)new Random().Next(10, 30), (float)new Random().Next(10, 30)),
+                //         angularVelocity: 0,
+                //         elasticity: .1f,
+                //         friction: 0.1f
+                //     );
+                //     AddBody(body, new Vector2f(50, 30));
+                // }
+                if(frames % 2 == 0 && usedBodies < 400)
                 {
-                    var body =  new CircleRigidBody(
-                        // float random radius between 1 and 4
-                        radius: 1f,
-                        window: window,
-                        // Random color
-                        color: new Color((byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255), (byte)new Random().Next(0, 255)),
-                        mass: 1,
-                        // Random velocity between -20 and 20
-                        velocity: new Vector2f((float).1, (float)-60.0),
-                        // velocity: new Vector2f((float)new Random().Next(10, 30), (float)new Random().Next(10, 30)),
-                        angularVelocity: 0,
-                        elasticity: .1f,
-                        friction: 0.1f
+                    var body = new VerletBody(
+                        collider: new CircleCollider(
+                            radius: 1.0f,
+                            position: new Vector2f(0, 0)
+                        ),
+                        drawer: new CircleDrawer(
+                            _window: window,
+                            radius: 1.0f * PhysicsConstants.PixelsPerMeter,
+                            color: Color.Red
+                        ),
+                        isStatic: false,
+                        velocity: new Vector2f(40, 30)
                     );
                     AddBody(body, new Vector2f(50, 30));
+                    body.ApplyAcceleration(new Vector2f(30, 0));
                 }
 
                 // Update the scene

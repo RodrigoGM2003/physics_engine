@@ -1,0 +1,57 @@
+SCN
+#Settings
+AspectRatio: 4/3
+WindowHeight: 750
+PixelPerMeter: 10.0
+Gravity: 0, 9.81
+CollisionManager: BVH
+CollisionResolver: verlet
+SpeedFactor: 1.0
+Substeps: 64
+#EndSettings
+#SceneDefinition
+BodyCount: 4
+    type: rectangle
+    size: 100, 20
+    color: Black
+    mass: 1.0
+    elasticity: 1
+    friction: 1
+    solid: false
+    isStatic: true
+    position: 50.0, 0
+    rotation: 0
+End
+    type: rectangle
+    size: 20, 75
+    color: Black
+    mass: 1.0
+    elasticity: 1
+    friction: 1
+    solid: false
+    isStatic: true
+    position: 0.0, 37.5
+    rotation: 0
+End
+    type: rectangle
+    size: 100, 20
+    color: Black
+    mass: 1.0
+    elasticity: 1
+    friction: 1
+    solid: false
+    isStatic: true
+    position: 50, 75
+    rotation: 0
+End
+    type: rectangle
+    size: 20, 75
+    color: Black
+    mass: 1.0
+    elasticity: 1
+    friction: 1
+    solid: false
+    isStatic: true
+    position: 100, 37.5
+    rotation: 0
+End

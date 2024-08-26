@@ -26,40 +26,40 @@ namespace PhysicsEngine
             Vector2f aToB = bodyB.Position - bodyA.Position;
             Vector2f bToA = bodyA.Position - bodyB.Position;
 
-            // float checkA = aToB.Dot(bodyA.Velocity);
-            // float checkB = bToA.Dot(bodyB.Velocity);
+            float checkA = aToB.Dot(bodyA.Velocity);
+            float checkB = bToA.Dot(bodyB.Velocity);
 
             if(bodyA.IsStatic)
             {
                 if(bToA.Dot(normal) < 0)
-                    bodyB.Position += normal * depth * 1.1f;
+                    bodyB.Position += normal * depth ;//* 1.1f;
                 else
-                    bodyB.Position -= normal * depth * 1.1f;
+                    bodyB.Position -= normal * depth ;//* 1.1f;
 
             }
             else if(bodyB.IsStatic)
             {
                 if(aToB.Dot(normal) < 0)
-                    bodyA.Position += normal * depth * 1.1f;
+                    bodyA.Position += normal * depth ;//* 1.1f;
                 else
-                    bodyA.Position -= normal * depth * 1.1f;
+                    bodyA.Position -= normal * depth ;//* 1.1f;
             }
             else
             {
                 if(bToA.Dot(normal) < 0)
                 {
-                    bodyA.Position -= normal * depth / 2 * 1.1f;
-                    bodyB.Position += normal * depth / 2 * 1.1f;
+                    bodyA.Position -= normal * depth / 2 ;//* 1.1f;
+                    bodyB.Position += normal * depth / 2 ;//* 1.1f;
                 }
                 else
                 {
-                    bodyA.Position += normal * depth / 2 * 1.1f;
-                    bodyB.Position -= normal * depth / 2 * 1.1f;
+                    bodyA.Position += normal * depth / 2 ;//* 1.1f;
+                    bodyB.Position -= normal * depth / 2 ;//* 1.1f;
                 }
             }
 
-            // return (checkA < 0 && checkB < 0);
-            return true;
+            return (checkA < 0 && checkB < 0);
+            
         }
 
         /**

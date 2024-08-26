@@ -12,7 +12,7 @@ namespace PhysicsEngine
         public const float PixelsPerMeter = 10.0f;
         public const float LinearDamping = 0.1f;
 
-        public const float Gravity = 9.81f;
+        public const float Gravity = 100.0f;//9.81f;
 
         public static Vector2f GravityVector
         {

@@ -12,8 +12,8 @@ namespace PhysicsEngine
      */
     public abstract class Body //: Body
     {
-        private Vector2f _position; // Position in m
-        private bool _isStatic; // Rotation in rads
+        protected Vector2f _position; // Position in m
+        protected bool _isStatic; // Rotation in rads
 
         public Vector2f Velocity { get; set; } // Velocity in m/s
 

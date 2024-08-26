@@ -3,59 +3,31 @@ using SFML.Graphics;
 using SFML.Window;
 using SFML.System;
 using System.Data;
+using System.Numerics;
 
 namespace PhysicsEngine
 {
     /**
      * Class for all physic bodies in the simulation
      */
-    public class RigidBody : Body
+    public class VerletBody : Body
     {
-        private float _mass; // Mass in kg
-        private float _inverseMass; // Inverse mass in kg^-1
-        private float _rotation; // Rotation in grads
+        protected Vector2f _oldPosition; // Position in m
         public Vector2f Acceleration { get; set; } // Acceleration in m/s^2
-        public float AngularVelocity { get; set; } // Angular velocity in rads/s
-        public float AngularAcceleration { get; set; } // Angular acceleration in rads/s^2
         public override Vector2f Position // Property for the position of the object
         {
             get => _position;
-            set
-            {
-                _position = value;
-                Collider.UpdatePosition(_position, _rotation);
-                Collider.UpdateSweptAABB();
-            }
+            set => _position = value;
         }
-
-        public float Rotation // Property for the rotation of the object
+        public Vector2f OldPosition // Property for the old position of the object
         {
-            get => _rotation;
-            set
-            {
-                _rotation = value;
-                Collider.UpdatePosition(_position, _rotation);
-                Collider.UpdateSweptAABB();
-            }
+            get => _oldPosition;
+            set => _oldPosition = value;
         }
-        public float Mass // Property for the mass of the object
-        {
-            get => _mass;
-            set
-            {
-                _mass = value;
-                UpdateInverseMass();
-            }
-        }
-        public float InverseMass => _inverseMass; // Property for the inverse mass of the object
         public override bool IsStatic // Property for the staticness of the object
         {
             get => _isStatic;
-            set
-            {
-                _isStatic = value;
-                UpdateInverseMass();
-            }
+            set => _isStatic = value;
         }
 
         /**
@@ -68,22 +40,16 @@ namespace PhysicsEngine
         * @param mass The mass of the object in kg
         * @param angularVelocity The angular velocity of the object in rads/s
         */
-        public RigidBody(in Collider collider, in Drawer drawer, float? rotation = 0, Vector2f? velocity = null, 
-                        Vector2f? acceleration = null, float? mass = null, float? angularVelocity = null, 
-                        float? angularAcceleration = null, bool isStatic = false)
+        public VerletBody(in Collider collider, in Drawer drawer, Vector2f? velocity = null, bool isStatic = false)
         {
             Collider = collider;
             Drawer = drawer;
 
             Position = new Vector2f(0, 0);
-            Rotation = rotation ?? 0;
-
-            Mass = mass ?? 1;
+            OldPosition = new Vector2f(0, 0);
 
             Velocity = velocity ?? new Vector2f(0, 0);
-            Acceleration = acceleration ?? new Vector2f(0, 0);
-            AngularVelocity = angularVelocity ?? 0;
-            AngularAcceleration = angularAcceleration ?? 0;
+            Acceleration = new Vector2f(0, 0);
 
             IsStatic = isStatic;
         }
@@ -94,7 +60,8 @@ namespace PhysicsEngine
         */
         public override void Start(Vector2f position)
         {
-            Position = position;
+            _position = position;
+            _oldPosition = position;
         }
 
         /**
@@ -103,19 +70,20 @@ namespace PhysicsEngine
         */
         public override void Update(in float deltaTime)
         {
-            Velocity += Acceleration * deltaTime;
-            Position += Velocity * deltaTime;
-            AngularVelocity += AngularAcceleration * deltaTime;
-            Rotation = Rotation + AngularVelocity * deltaTime % (MathF.PI * 2);
-            AngularAcceleration = 0;
+            Velocity = _position - _oldPosition;
+            _oldPosition = _position;
+            _position = _position + Velocity + (Acceleration * deltaTime * deltaTime);
+
             Acceleration = new Vector2f(0, 0);
+
+            
             if (!IsStatic)
-            {
                 // Apply gravity if the object has mass
                 ApplyAcceleration(PhysicsConstants.GravityVector);
-            }
+            // ApplyAcceleration(PhysicsConstants.GravityVector);
+            
             //Update the colliders position
-            Collider.UpdatePosition(Position, Rotation);
+            Collider.UpdatePosition(_position, 0);
             Collider.UpdateSweptAABB();
         }
 
@@ -127,7 +95,7 @@ namespace PhysicsEngine
         */
         public override void Draw()
         {   
-            Drawer.Draw(Position, Rotation);
+            Drawer.Draw(Position, 0);
 
             // RectangleShape shape = new RectangleShape(Collider.SweptAABB.Size * PhysicsConstants.PixelsPerMeter);
             // shape.Position = new Vector2f(Collider.SweptAABB.Left * PhysicsConstants.PixelsPerMeter, Collider.SweptAABB.Top * PhysicsConstants.PixelsPerMeter);
@@ -155,25 +123,6 @@ namespace PhysicsEngine
             // RenderWindowManager.Window.Draw(circle);
         }
 
-        /**
-        * Apply a force to the RigidBody
-        * @param force The force to apply to the object
-        */
-        public void ApplyForce(Vector2f force)
-        {
-            Acceleration += force / Mass;
-        }
-
-        /**
-        * Apply an impulse to the RigidBody
-        * @param impulse The impulse to apply to the object
-        *
-        * Note: Impulse is a "sudden" change in velocity, so we divide by mass to get the acceleration
-        */
-        public void ApplyImpulse(Vector2f impulse)
-        {
-            Velocity += impulse / Mass;
-        }
 
         /**
         * Apply an acceleration to the RigidBody
@@ -184,12 +133,5 @@ namespace PhysicsEngine
             Acceleration += acceleration;
         }
 
-        /**
-        * Update the value of inverse mass of the object
-        */
-        private void UpdateInverseMass() // Method to update the inverse mass of the object
-        {
-            _inverseMass = _isStatic ? 0 : 1 / _mass;
-        }
     }
 }
