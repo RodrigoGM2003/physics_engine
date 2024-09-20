@@ -32,29 +32,29 @@ namespace PhysicsEngine
             if(bodyA.IsStatic)
             {
                 if(bToA.Dot(normal) < 0)
-                    bodyB.Position += normal * depth ;//* 1.1f;
+                    bodyB.Position += normal * depth;
                 else
-                    bodyB.Position -= normal * depth ;//* 1.1f;
+                    bodyB.Position -= normal * depth;
 
             }
             else if(bodyB.IsStatic)
             {
                 if(aToB.Dot(normal) < 0)
-                    bodyA.Position += normal * depth ;//* 1.1f;
+                    bodyA.Position += normal * depth;
                 else
-                    bodyA.Position -= normal * depth ;//* 1.1f;
+                    bodyA.Position -= normal * depth;
             }
             else
             {
                 if(bToA.Dot(normal) < 0)
                 {
-                    bodyA.Position -= normal * depth / 2 ;//* 1.1f;
-                    bodyB.Position += normal * depth / 2 ;//* 1.1f;
+                    bodyA.Position -= normal * depth / 2;
+                    bodyB.Position += normal * depth / 2;
                 }
                 else
                 {
-                    bodyA.Position += normal * depth / 2 ;//* 1.1f;
-                    bodyB.Position -= normal * depth / 2 ;//* 1.1f;
+                    bodyA.Position += normal * depth / 2;
+                    bodyB.Position -= normal * depth / 2;
                 }
             }
 

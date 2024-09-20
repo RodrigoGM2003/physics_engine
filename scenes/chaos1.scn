@@ -1,0 +1,35 @@
+SCN
+#Settings
+AspectRatio: 4/3
+WindowHeight: 750
+PixelPerMeter: 10.0
+Gravity: 0, 9.81
+CollisionManager: BVH
+CollisionResolver: dcd
+SpeedFactor: 1.0
+Substeps: 4
+#EndSettings
+#SceneDefinition
+BodyCount: 2
+    type: rectangle
+    size: 200, 10
+    color: Black
+    mass: 1.0
+    elasticity: 1
+    friction: 1
+    solid: false
+    isStatic: true
+    position: 50, 80
+    rotation: 0.78539
+End
+    type: rectangle
+    size: 200, 10
+    color: Black
+    mass: 1.0
+    elasticity: 1
+    friction: 1
+    solid: false
+    isStatic: true
+    position: 50, 80
+    rotation: -0.78539
+End

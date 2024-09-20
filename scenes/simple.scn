@@ -7,7 +7,7 @@ Gravity: 0, 9.81
 CollisionManager: BVH
 CollisionResolver: dcd
 SpeedFactor: 1.0
-Substeps: 32
+Substeps: 16
 #EndSettings
 #SceneDefinition
 BodyCount: 4
